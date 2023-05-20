@@ -33,18 +33,17 @@
 
   <d-abstract>
     <p>
-      Most multicellular organisms begin their life as a single egg cell - a
-      single cell whose progeny reliably self-assemble into highly complex
-      anatomies with many organs and tissues in precisely the same arrangement
-      each time. The ability to build their own bodies is probably the most
-      fundamental skill every living creature possesses. Morphogenesis (the
-      process of an organism’s shape development) is one of the most striking
-      examples of a phenomenon called <i>self-organisation</i>. Cells, the tiny
-      building blocks of bodies, communicate with their neighbors to decide the
-      shape of organs and body plans, where to grow each organ, how to
-      interconnect them, and when to eventually stop. Understanding the interplay
-      of the emergence of complex outcomes from simple rules and
-      homeostatic.
+      Pairing a neuro-symbolic model with library learning to facilitate <i>program induction</i> seems a 
+      promising way of fostering open-ended innovation, by leveraging the robustness, expressivity, 
+      and extrapolative capabilities of programs. This paper investigates how Open-Ended Dreamer (OED), 
+      an unsupervised diversity-oriented neuro-symbolic learner built upon DreamCoder <d-cite key="ellis2021dreamcoder"></d-cite>, 
+      may support open-ended program discovery. By alternating between phases of generation, selection, and abstraction, 
+      OED aims to expand a hierarchical library of diversity-enabling building blocks (in the form of programs), 
+      which are subsequently reused and composed in later iterations. As a first test-bed, we apply OED to a tower building
+       domain and investigate the impact of library learning, neural guidance, innate priors, and language 
+       or environmental pressures on the formation of symbolic knowledge. Our experiments suggest that promoting 
+       greater exploration and stochasticity is crucial to offset the bias introduced by the growing language, 
+       and foster more creative divergence.
     </p>
   </d-abstract>
 
@@ -54,7 +53,6 @@
       <h3>Authors</h3>
       <br>
         <p>Claire Glanois</p>
-      
         <br>
         <p></p> Shyam Sudhakaran</p>
 
@@ -95,40 +93,42 @@
 </d-contents>
 
 
-  <p>
-    Most multicellular organisms begin their life as a single egg cell - a
-    single cell whose progeny reliably self-assemble into highly complex
-    anatomies with many organs and tissues in precisely the same arrangement
-    each time. The ability to build their own bodies is probably the most
-    fundamental skill every living creature possesses. Morphogenesis (the
-    process of an organism’s shape development) is one of the most striking
-    examples of a phenomenon called <i>self-organisation</i>. Cells, the tiny
-    building blocks of bodies, communicate with their neighbors to decide the
-    shape of organs and body plans, where to grow each organ, how to
-    interconnect them, and when to eventually stop. Understanding the interplay
-    of the emergence of complex outcomes from simple rules and
-    homeostatic<d-footnote>
-      Self-regulatory feedback loops trying maintain the body in a stable state
-      or preserve its correct overall morphology under external
-      perturbations</d-footnote>
-    feedback loops is an active area of research
-    <d-cite key="PezzuloGiovanniLevin2016,C5IB00221D"></d-cite>. What is clear
-    is that evolution has learned to exploit the laws of physics and computation
-    to implement the highly robust morphogenetic software that runs on
-    genome-encoded cellular hardware.
-  </p>
-
 
   <p>
-    Imagine if we could design systems of the same plasticity and robustness as
-    biological life: structures and machines that could grow and repair
-    themselves. Such technology would transform the current efforts in
-    regenerative medicine, where scientists and clinicians seek to discover the
-    inputs or stimuli that could cause cells in the body to build structures on
-    demand as needed. To help crack the puzzle of the morphogenetic code, and
-    also exploit the insights of biology to create self-repairing systems in
-    real life, we try to replicate some of the desired properties in an
-    <i>in silico</i> experiment.
+   Open-ended refers to a process that produces increasingly
+    diverse and complex artifacts or behaviors. An archetypal
+    inspiration are evolutionary processes which, through iterations 
+    blending variation and selection mechanisms, have
+    brought a stunningly diverse array of lifeforms on Earth.
+    Most of these lifeforms showcase a complex nested and
+    modular structure, whose primitive components can be
+    found across numerous other species.
+    Similarly, a significant part of human knowledge (factual
+    or even procedural) exhibit some form of hierarchical and
+    compositional structure, as we relentlessly invent more complex 
+    artifacts and behaviors from previous stepping stones
+    —explicit or implicit, collective or individual. This ability
+    to re-use, combine, transfer or scale previous discoveries is
+    crucial to both human learning and adaptation.
+    Methods combining symbolic component with neural
+    learning have shown great potential in grasping forms of
+    compositional generalisation, while providing interpretable
+    representations (Chen et al., 2020; De Raedt et al., 2019).
+    For instance, a neuro-symbolic model like DreamCoder (Ellis et al., 2021) h
+    as proven to be versatile in tackling multiple domains via program induction<d-footnote>
+    Programs are an adaptive, robust and expressive way to encode
+    both artifacts and behaviors, compelling for their logical, interpretative and extrapolative qualities.</d-footnote>
+    ,from creative tasks as logo generation to more classic programming inductive 
+    tasks like physical laws regression.
+    This work extends DreamCoder towards open-endedness, with ways to encourage diversity 
+    in both program generation and abstraction, but also making it less dependent on
+    supervision. Our diversity-oriented neuro-symbolic model—Open-Ended Dreamer (OED)— 
+    balances efficiency and novelty pressures in order to learn a compact and diverse
+    set of reusable programs, organised in a hierarchical library.
+
+    
+
+
   </p>
 
   <h2 id="model">Model</h2>
@@ -293,10 +293,7 @@
       sudden jumps of the loss value in the later stages of the training. We
       managed to mitigate them by applying per-variable L2 normalization to
       parameter gradients. This may have the effect similar to the weight
-      normalization <d-cite key="Salimans2016WeightNA"></d-cite>. Other training
-      parameters are available in the accompanying source code.</d-footnote>
-    with respect to the update rule parameters by backpropagation-through-time,
-    the standard method of training recurrent neural networks.
+      
   </p>
 
 
@@ -347,53 +344,12 @@
   <p>
     This article describes a toy embryogenesis and regeneration model. This is a
     major direction for future work, with many applications in biology and
-    beyond. In addition to the implications for understanding the evolution and
-    control of regeneration, and harnessing this understanding for biomedical
-    repair, there is the field of bioengineering. As the field transitions from
-    synthetic biology of single cell collectives to a true synthetic morphology
-    of novel living machines <d-cite key="Kriegman1853, Kamm2018"></d-cite>, it
-    will be essential to develop strategies for programming system-level
-    capabilities, such as anatomical homeostasis (regenerative repair). It has
-    long been known that regenerative organisms can restore a specific
-    anatomical pattern; however, more recently it’s been found that the target
-    morphology is not hard coded by the DNA, but is maintained by a
-    physiological circuit that stores a setpoint for this anatomical homeostasis
-    <d-cite key="doi:10.1080/19420889.2016.1192733"></d-cite>. Techniques are
-    now available for re-writing this setpoint, resulting for example
-    <d-cite key="OVIEDO2010188,DURANT20172231"></d-cite> in 2-headed flatworms
-    that, when cut into pieces in plain water (with no more manipulations)
-    result in subsequent generations of 2-headed regenerated worms (as shown
-    above). It is essential to begin to develop models of the computational
-    processes that store the system-level target state for swarm behavior
-    <d-cite key="doi:10.1162/isal_a_00043, PIETAK201852, doi:10.1162/isal_a_00041, doi:10.1162/isal_a_029"></d-cite>, so that efficient strategies can be developed for rationally editing this
-    information structure, resulting in desired large-scale outcomes (thus
-    defeating the inverse problem that holds back regenerative medicine and many
-    other advances).
+    beyond.
   </p>
   <h3>Engineering and machine learning</h3>
   <p>
     The models described in this article run on the powerful GPU of a modern
-    computer or a smartphone. Yet, let’s speculate about what a “more physical”
-    implementation of such a system could look like. We can imagine it as a grid
-    of tiny independent computers, simulating individual cells. Each of those
-    computers would require approximately 10Kb of ROM to store the “cell
-    genome”: neural network weights and the control code, and about 256 bytes of
-    RAM for the cell state and intermediate activations. The cells must be able
-    to communicate their 16-value state vectors to neighbors. Each cell would
-    also require an RGB-diode to display the color of the pixel it represents. A
-    single cell update would require about 10k multiply-add operations and does
-    not have to be synchronised across the grid. We propose that cells might
-    wait for random time intervals between updates. The system described above
-    is uniform and decentralised. Yet, our method provides a way to program it
-    to reach the predefined global state, and recover this state in case of
-    multi-element failures and restarts. We therefore conjecture this kind of
-    modeling may be used for designing reliable, self-organising agents. On the
-    more theoretical machine learning front, we show an instance of a
-    decentralized model able to accomplish remarkably complex tasks. We believe
-    this direction to be opposite to the more traditional global modeling used
-    in the majority of contemporary work in the deep learning field, and we hope
-    this work to be an inspiration to explore more decentralized learning
-    modeling.
+    computer or a smartphone.
   </p>
 
 </d-article>
@@ -456,8 +412,8 @@
 
   <!--REFERENCES-->
   <d-citation-list distill-prerendered="true">
-  <h3 id="references">References</h3><ol id="references-list" class="references"><li id="PezzuloGiovanniLevin2016"><span class="title">Top-down models in biology: explanation and control of complex living systems above the molecular level</span>   <a href="https://royalsocietypublishing.org/doi/abs/10.1098/rsif.2016.0555">[link]</a><br>Pezzulo, G. and Levin, M., 2016. Journal of The Royal Society Interface, Vol 13(124), pp. 20160555.  <a href="https://doi.org/10.1098/rsif.2016.0555" style="text-decoration:inherit;">DOI: 10.1098/rsif.2016.0555</a></li>
-    <li id="mordvintsev2015inceptionism"><span class="title">Inceptionism: Going deeper into neural networks</span>   <a href="https://research.googleblog.com/2015/06/inceptionism-going-deeper-into-neural.html">[HTML]</a><br>Mordvintsev, A., Olah, C. and Tyka, M., 2015. Google Research Blog. </li></ol>
+  <h3 id="references">References</h3><ol id="references-list" class="references"><li id="ellis2021dreamcoder"><span class="title">Dreamcoder: Bootstrapping inductive program synthesis with wake-sleep library learning.</span> <br>Ellis, K., Wong, C., Nye, M., Sable-Meyer, M., Morales, L., Hewitt, L., Cary, L., Solar-Lezama, A., and Tenenbaum, J. B, 2021. . In Proceedings of the 42nd acm sigplan international conference on programming language design and implementation, pages 835–850.</li>
+   </ol>
   </d-citation-list>
 
 </d-appendix>
