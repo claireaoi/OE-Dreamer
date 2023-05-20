@@ -365,6 +365,11 @@ d-title .status span {
  text-transform: uppercase;
 }
 
+/* ****************************************
+    * Line by Line
+    ******************************************/
+
+
 
 d-byline {
  contain: style;
@@ -433,6 +438,13 @@ d-byline .affiliations {
 }
 
 
+/* ****************************************
+    * ARTICLE
+    ******************************************/
+
+
+
+
 d-article {
  contain: layout style;
  overflow-x: hidden;
@@ -460,8 +472,6 @@ d-article > * {
 
 
 /* H2 */
-
-
 d-article .marker {
  text-decoration: none;
  border: none;
@@ -652,6 +662,11 @@ d-figure {
 
 /* Tables */
 
+/* ****************************************
+    * TABLE ARTICLE
+    ******************************************/
+
+
 d-article table {
  border-collapse: collapse;
  margin-bottom: 1.5rem;
@@ -681,6 +696,10 @@ d-article table tbody :first-child td {
 }
 
 
+   /* ****************************************
+       * LATEX
+       ******************************************/
+
 span.katex-display {
  text-align: left;
  padding: 8px 0 8px 0;
@@ -694,6 +713,9 @@ span.katex {
 }
 
 
+   /* ****************************************
+       * TO PRINT
+       ******************************************/
 @media print {
 
  @page {
