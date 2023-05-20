@@ -1,0 +1,475 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <link rel="stylesheet" type="text/css" href="css/style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/1.0.17/webcomponents-loader.js"></script>
+  <script src="twgl.min.js"></script>
+  <link rel="stylesheet" href="https://distill.pub/third-party/katex/katex.min.css" crossorigin="anonymous">
+      
+  <script src="https://distill.pub/template.v2.js"></script>
+  <script src="https://distill.pub/third-party/highlight/highlight.pack.js"></script>
+
+  <title>Open Ended Dreamer</title>
+    
+    <link rel="canonical" href="https://claireaoi.github.io/OE-dreams/">
+    
+    <!--  https://schema.org/Article -->
+
+    <!--  https://scholar.google.com/intl/en/scholar/inclusion.html#indexing -->
+
+
+</head>
+
+<body distill-prerendered>
+
+
+  <d-title>
+    <h3 style="text-align: center;">Open Ended Dreamer</h3>
+  </d-title>
+
+  <d-abstract>
+    <p>
+      Most multicellular organisms begin their life as a single egg cell - a
+      single cell whose progeny reliably self-assemble into highly complex
+      anatomies with many organs and tissues in precisely the same arrangement
+      each time. The ability to build their own bodies is probably the most
+      fundamental skill every living creature possesses. Morphogenesis (the
+      process of an organism’s shape development) is one of the most striking
+      examples of a phenomenon called <i>self-organisation</i>. Cells, the tiny
+      building blocks of bodies, communicate with their neighbors to decide the
+      shape of organs and body plans, where to grow each organ, how to
+      interconnect them, and when to eventually stop. Understanding the interplay
+      of the emergence of complex outcomes from simple rules and
+      homeostatic.
+    </p>
+  </d-abstract>
+
+  <d-byline>
+  <div class="byline grid">
+    <div>
+      <h3>Authors</h3>
+      <br>
+        <p>Claire Glanois</p>
+      
+        <br>
+        <p></p> Shyam Sudhakaran</p>
+
+        <br>
+        <p>Elias Najarro</p>
+        <br>
+        <p>Sebastian Risi</p>
+        
+
+      
+    </div>
+    <div>
+      <h3>Affiliation</h3>
+    
+        <p>IT University of Copenhagen</p>
+    </div>
+
+    <div>
+      <h3>Published</h3>
+      <p>at Alife 2023</p> 
+    </div>
+  </div>
+</d-byline>
+
+<d-article>
+<d-contents>
+  <nav class="l-text toc figcaption">
+    <h3>Contents</h3>
+    <div><a href="#model">Model</a></div>
+    <div><a href="#experiment-1">Experiments</a></div>
+    <ul>
+      <li><a href="#experiment-1">Ablation Experiment</a></li>
+      <li><a href="#experiment-2">Bias Experiment</a></li>
+      <li><a href="#experiment-3">Novelty-Diversity Trade Off</a></li>
+    </ul>
+    <div><a href="#discussion">Discussion</a></div>
+  </nav>
+</d-contents>
+
+
+  <p>
+    Most multicellular organisms begin their life as a single egg cell - a
+    single cell whose progeny reliably self-assemble into highly complex
+    anatomies with many organs and tissues in precisely the same arrangement
+    each time. The ability to build their own bodies is probably the most
+    fundamental skill every living creature possesses. Morphogenesis (the
+    process of an organism’s shape development) is one of the most striking
+    examples of a phenomenon called <i>self-organisation</i>. Cells, the tiny
+    building blocks of bodies, communicate with their neighbors to decide the
+    shape of organs and body plans, where to grow each organ, how to
+    interconnect them, and when to eventually stop. Understanding the interplay
+    of the emergence of complex outcomes from simple rules and
+    homeostatic<d-footnote>
+      Self-regulatory feedback loops trying maintain the body in a stable state
+      or preserve its correct overall morphology under external
+      perturbations</d-footnote>
+    feedback loops is an active area of research
+    <d-cite key="PezzuloGiovanniLevin2016,C5IB00221D"></d-cite>. What is clear
+    is that evolution has learned to exploit the laws of physics and computation
+    to implement the highly robust morphogenetic software that runs on
+    genome-encoded cellular hardware.
+  </p>
+
+
+  <p>
+    Imagine if we could design systems of the same plasticity and robustness as
+    biological life: structures and machines that could grow and repair
+    themselves. Such technology would transform the current efforts in
+    regenerative medicine, where scientists and clinicians seek to discover the
+    inputs or stimuli that could cause cells in the body to build structures on
+    demand as needed. To help crack the puzzle of the morphogenetic code, and
+    also exploit the insights of biology to create self-repairing systems in
+    real life, we try to replicate some of the desired properties in an
+    <i>in silico</i> experiment.
+  </p>
+
+  <h2 id="model">Model</h2>
+  <p>
+    Those in engineering disciplines and researchers often use many kinds of
+    simulations incorporating local interaction, including systems of partial
+    derivative equation (PDEs), particle systems, and various kinds of Cellular
+    Automata (CA). We will focus on Cellular Automata models as a roadmap for
+    the effort of identifying cell-level rules which give rise to complex,
+    regenerative behavior of the collective. CAs typically consist of a grid of
+    cells being iteratively updated, with the same set of rules being applied to
+    each cell at every step. The new state of a cell depends only on the states
+    of the few cells in its immediate neighborhood. Despite their apparent
+    simplicity, CAs often demonstrate rich, interesting behaviours, and have a
+    long history of being applied to modeling biological phenomena.
+  </p>
+
+
+  <p>
+    </p><figure style="
+        margin-left: auto;
+        margin-right: auto;
+        grid-column: page;
+        width: 100%;
+        max-width: 2000px;
+      ">
+      <object data="figures/model.svg" type="image/svg+xml" style="width: 100%"></object>
+      <figcaption style="">A single update step of the model.</figcaption>
+    </figure>
+  <p></p>
+
+
+  <p>
+    The alpha channel (<span><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>α</mi></mrow><annotation encoding="application/x-tex">\alpha</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.43056em;"></span><span class="strut bottom" style="height:0.43056em;vertical-align:0em;"></span><span class="base"><span class="mord mathit" style="margin-right:0.0037em;">α</span></span></span></span></span>) has a special meaning: it demarcates living
+    cells, those belonging to the pattern being grown. In particular, cells
+    having <span><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>α</mi><mo>&gt;</mo><mn>0</mn><mi mathvariant="normal">.</mi><mn>1</mn></mrow><annotation encoding="application/x-tex">\alpha &gt; 0.1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.64444em;"></span><span class="strut bottom" style="height:0.68354em;vertical-align:-0.0391em;"></span><span class="base"><span class="mord mathit" style="margin-right:0.0037em;">α</span><span class="mrel">&gt;</span><span class="mord mathrm">0</span><span class="mord mathrm">.</span><span class="mord mathrm">1</span></span></span></span></span> and their neighbors are considered “living”. Other
+    cells are “dead” or empty and have their state vector values explicitly set
+    to 0.0 at each time step. Thus cells with <span><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>α</mi><mo>&gt;</mo><mn>0</mn><mi mathvariant="normal">.</mi><mn>1</mn></mrow><annotation encoding="application/x-tex">\alpha &gt; 0.1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.64444em;"></span><span class="strut bottom" style="height:0.68354em;vertical-align:-0.0391em;"></span><span class="base"><span class="mord mathit" style="margin-right:0.0037em;">α</span><span class="mrel">&gt;</span><span class="mord mathrm">0</span><span class="mord mathrm">.</span><span class="mord mathrm">1</span></span></span></span></span> can be thought of
+    as “mature”, while their neighbors with <span><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>α</mi><mo>≤</mo><mn>0</mn><mi mathvariant="normal">.</mi><mn>1</mn></mrow><annotation encoding="application/x-tex">\alpha \leq 0.1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.64444em;"></span><span class="strut bottom" style="height:0.78041em;vertical-align:-0.13597em;"></span><span class="base"><span class="mord mathit" style="margin-right:0.0037em;">α</span><span class="mrel">≤</span><span class="mord mathrm">0</span><span class="mord mathrm">.</span><span class="mord mathrm">1</span></span></span></span></span> are “growing”, and
+    can become mature if their alpha passes the 0.1 threshold.
+  </p>
+
+  <figure>
+    <img src="figures/alive2.svg" style="width: 300px">
+    <figcaption>
+      <span><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mover accent="true"><mrow><mi>s</mi><mi>t</mi><mi>a</mi><mi>t</mi><mi>e</mi></mrow><mo>⃗</mo></mover><mo>→</mo><mn>0</mn><mi mathvariant="normal">.</mi><mn>0</mn><mn>0</mn></mrow><annotation encoding="application/x-tex">\vec{state} \rightarrow 0.00</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.89852em;"></span><span class="strut bottom" style="height:0.89852em;vertical-align:0em;"></span><span class="base"><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.89852em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathit">s</span><span class="mord mathit">t</span><span class="mord mathit">a</span><span class="mord mathit">t</span><span class="mord mathit">e</span></span></span><span style="top:-3.18408em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body accent-vec" style="margin-left:0em;"><span>⃗</span></span></span></span></span></span></span><span class="mrel">→</span><span class="mord mathrm">0</span><span class="mord mathrm">.</span><span class="mord mathrm">0</span><span class="mord mathrm">0</span></span></span></span></span> when no neighbour with <span><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>α</mi><mo>&gt;</mo><mn>0</mn><mi mathvariant="normal">.</mi><mn>1</mn><mn>0</mn></mrow><annotation encoding="application/x-tex">\alpha &gt; 0.10</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.64444em;"></span><span class="strut bottom" style="height:0.68354em;vertical-align:-0.0391em;"></span><span class="base"><span class="mord mathit" style="margin-right:0.0037em;">α</span><span class="mrel">&gt;</span><span class="mord mathrm">0</span><span class="mord mathrm">.</span><span class="mord mathrm">1</span><span class="mord mathrm">0</span></span></span></span></span>
+    </figcaption>
+  </figure>
+
+  
+
+  <p>
+    <strong>Perception.</strong> This step defines what each cell perceives of
+    the environment surrounding it. We implement this via a 3x3 convolution with
+    a fixed kernel. One may argue that defining this kernel is superfluous -
+    after all we could simply have the cell learn the requisite perception
+    kernel coefficients. Our choice of fixed operations are motivated by the
+    fact that real life cells often rely only on chemical gradients to guide the
+    organism development. Thus, we are using classical Sobel filters to estimate
+    the partial derivatives of cell state channels in the <span><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mover accent="true"><mrow><mi>x</mi></mrow><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{x}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.71444em;"></span><span class="strut bottom" style="height:0.71444em;vertical-align:0em;"></span><span class="base"><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.71444em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathit">x</span></span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body accent-vec" style="margin-left:0.05556em;"><span>⃗</span></span></span></span></span></span></span></span></span></span></span> and
+    <span><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mover accent="true"><mrow><mi>y</mi></mrow><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{y}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.71444em;"></span><span class="strut bottom" style="height:0.9088799999999999em;vertical-align:-0.19444em;"></span><span class="base"><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.71444em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathit" style="margin-right:0.03588em;">y</span></span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body accent-vec" style="margin-left:0.11112em;"><span>⃗</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.19444em;"></span></span></span></span></span></span></span></span> directions, forming a 2D gradient vector in each direction, for
+    each state channel. We concatenate those gradients with the cells own
+    states, forming a <span><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>1</mn><mn>6</mn><mo>∗</mo><mn>2</mn><mo>+</mo><mn>1</mn><mn>6</mn><mo>=</mo><mn>4</mn><mn>8</mn></mrow><annotation encoding="application/x-tex">16*2+16=48</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.64444em;"></span><span class="strut bottom" style="height:0.72777em;vertical-align:-0.08333em;"></span><span class="base"><span class="mord mathrm">1</span><span class="mord mathrm">6</span><span class="mbin">∗</span><span class="mord mathrm">2</span><span class="mbin">+</span><span class="mord mathrm">1</span><span class="mord mathrm">6</span><span class="mrel">=</span><span class="mord mathrm">4</span><span class="mord mathrm">8</span></span></span></span></span> dimensional <i>perception vector</i>, or
+    rather <i>percepted vector, </i>for each cell.
+  </p>
+
+  <d-code block="" language="python">
+    <p>def perceive(state_grid):</p>
+    <p>sobel_x = [[-1, 0, +1],</p>
+    <p>[-2, 0, +2],</p>
+    <p>[-1, 0, +1]]</p>
+    <p>sobel_y = transpose(sobel_x)</p>
+    <p># Convolve sobel filters with states</p>
+    <p># in x, y and channel dimension.</p>
+    <p>grad_x = conv2d(sobel_x, state_grid)</p>
+    <p>grad_y = conv2d(sobel_y, state_grid)</p>
+    <p># Concatenate the cell’s state channels,</p>
+    <p># the gradients of channels in x and</p>
+    <p># the gradient of channels in y.</p>
+    <p>perception_grid = concat(</p>
+    <p>state_grid, grad_x, grad_y, axis=2)</p>
+    <p>return perception_grid</p>
+  </d-code>
+
+  <p>
+    <strong>Update rule.</strong> Each cell now applies a series of operations
+    to the perception vector, consisting of typical differentiable programming
+    building blocks, such as 1x1-convolutions and ReLU nonlinearities, which we
+    call the cell’s “update rule”. Recall that the update rule is learned, but
+    every cell runs the same update rule. The network parametrizing this update
+    rule consists of approximately 8,000 parameters. Inspired by residual neural
+    networks, the update rule outputs an incremental update to the cell’s state,
+    which applied to the cell before the next time step. The update rule is
+    designed to exhibit “do-nothing” initial behaviour - implemented by
+    initializing the weights of the final convolutional layer in the update rule
+    with zero. We also forego applying a ReLU to the output of the last layer of
+    the update rule as the incremental updates to the cell state must
+    necessarily be able to both add or subtract from the state.
+  </p>
+
+  <d-code block="" language="python">
+    <p>def update(perception_vector):</p>
+    <p># The following pseudocode operates on</p>
+    <p># a single cell’s perception vector.</p>
+    <p># Our reference implementation uses 1D</p>
+    <p># convolutions for performance reasons.</p>
+    <p>x = dense(perception_vector, output_len=128)</p>
+    <p>x = relu(x)</p>
+    <p>ds = dense(x, output_len=16, weights_init=0.0)</p>
+    <p>return ds</p>
+  </d-code>
+
+  <p>
+    <strong>Stochastic cell update.</strong> Typical cellular automata update
+    all cells simultaneously. This implies the existence of a global clock,
+    synchronizing all cells. Relying on global synchronisation is not something
+    one expects from a self-organising system. We relax this requirement by
+    assuming that each cell performs an update independently, waiting for a
+    random time interval between updates. To model this behaviour we apply a
+    random per-cell mask to update vectors, setting all update values to zero
+    with some predefined probability (we use 0.5 during training). This
+    operation can be also seen as an application of per-cell dropout to update
+    vectors.
+  </p>
+
+
+  <h2 id="experiment-1">Experiment 1: Learning to Grow</h2>
+  <p>
+    </p><figure style="
+        margin-left: auto;
+        margin-right: auto;
+        grid-column: page;
+        width: 100%;
+        max-width: 900px;
+      ">
+      <object data="figures/training.svg" type="image/svg+xml" style="width: 100%"></object>
+      <figcaption>Training regime for learning a target pattern.</figcaption>
+    </figure>
+  <p></p>
+  <p>
+    In our first experiment, we simply train the CA to achieve a target image
+    after a random number of updates. This approach is quite naive and will run
+    into issues. But the challenges it surfaces will help us refine future
+    attempts.
+  </p>
+
+  <p>
+    We initialize the grid with zeros, except a single seed cell in the center,
+    which will have all channels except RGB<d-footnote>
+      We set RGB channels of the seed to zero because we want it to be visible
+      on the white background.</d-footnote>
+    set to one. Once the grid is initialized, we iteratively apply the update
+    rule. We sample a random number of CA steps from the [64, 96]<d-footnote>
+      This should be a sufficient number of steps to grow the pattern of the
+      size we work with (40x40), even considering the stochastic nature of our
+      update rule.</d-footnote>
+    range for each training step, as we want the pattern to be stable across a
+    number of iterations. At the last step we apply pixel-wise L2 loss between
+    RGBA channels in the grid and the target pattern. This loss can be
+    differentiably optimized<d-footnote>
+      We observed training instabilities, that were manifesting themselves as
+      sudden jumps of the loss value in the later stages of the training. We
+      managed to mitigate them by applying per-variable L2 normalization to
+      parameter gradients. This may have the effect similar to the weight
+      normalization <d-cite key="Salimans2016WeightNA"></d-cite>. Other training
+      parameters are available in the accompanying source code.</d-footnote>
+    with respect to the update rule parameters by backpropagation-through-time,
+    the standard method of training recurrent neural networks.
+  </p>
+
+
+  <p>
+    </p><figure>
+      <video loop="" autoplay="" playsinline="" muted="" width="640px">
+        <source src="figures/unstable.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+      <figcaption>
+        Many of the patterns exhibit instability for longer time periods.
+        <br><br>
+      </figcaption>
+    </figure>
+  <p></p>
+
+
+  <h2 id="experiment-2">Experiment 2: What persists, exists</h2>
+  <p>
+    One way of understanding why the previous experiment was unstable is to draw
+    a parallel to dynamical systems. We can consider every cell to be a
+    dynamical system, with each cell sharing the same dynamics, and all cells
+    being locally coupled amongst themselves. When we train our cell update
+    model we are adjusting these dynamics. Our goal is to find dynamics that
+    satisfy a number of properties. Initially, we wanted the system to evolve
+    from the seed pattern to the target pattern - a trajectory which we achieved
+    in Experiment 1. Now, we want to avoid the instability we observed - which
+    in our dynamical system metaphor consists of making the target pattern an
+    attractor.
+  </p>
+
+  
+  <h2 id="experiment-3">Experiment 3: Rotating the perceptive field</h2>
+  <p>
+    As previously described, we model the cell’s perception of its neighbouring
+    cells by estimating the gradients of state channels in <span><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mover accent="true"><mrow><mi>x</mi></mrow><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{x}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.71444em;"></span><span class="strut bottom" style="height:0.71444em;vertical-align:0em;"></span><span class="base"><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.71444em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathit">x</span></span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body accent-vec" style="margin-left:0.05556em;"><span>⃗</span></span></span></span></span></span></span></span></span></span></span> and
+    <span><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mover accent="true"><mrow><mi>y</mi></mrow><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{y}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.71444em;"></span><span class="strut bottom" style="height:0.9088799999999999em;vertical-align:-0.19444em;"></span><span class="base"><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.71444em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathit" style="margin-right:0.03588em;">y</span></span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body accent-vec" style="margin-left:0.11112em;"><span>⃗</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.19444em;"></span></span></span></span></span></span></span></span> using Sobel filters. A convenient analogy is that each agent has
+    two sensors (chemosensory receptors, for instance) pointing in orthogonal
+    directions that can sense the gradients in the concentration of certain
+    chemicals along the axis of the sensor. What happens if we rotate those
+    sensors? We can do this by rotating the Sobel kernels.
+  </p>
+
+  
+  <h2 id="discussion">Discussion</h2>
+  <h3>Embryogenetic Modeling</h3>
+
+  <p>
+    This article describes a toy embryogenesis and regeneration model. This is a
+    major direction for future work, with many applications in biology and
+    beyond. In addition to the implications for understanding the evolution and
+    control of regeneration, and harnessing this understanding for biomedical
+    repair, there is the field of bioengineering. As the field transitions from
+    synthetic biology of single cell collectives to a true synthetic morphology
+    of novel living machines <d-cite key="Kriegman1853, Kamm2018"></d-cite>, it
+    will be essential to develop strategies for programming system-level
+    capabilities, such as anatomical homeostasis (regenerative repair). It has
+    long been known that regenerative organisms can restore a specific
+    anatomical pattern; however, more recently it’s been found that the target
+    morphology is not hard coded by the DNA, but is maintained by a
+    physiological circuit that stores a setpoint for this anatomical homeostasis
+    <d-cite key="doi:10.1080/19420889.2016.1192733"></d-cite>. Techniques are
+    now available for re-writing this setpoint, resulting for example
+    <d-cite key="OVIEDO2010188,DURANT20172231"></d-cite> in 2-headed flatworms
+    that, when cut into pieces in plain water (with no more manipulations)
+    result in subsequent generations of 2-headed regenerated worms (as shown
+    above). It is essential to begin to develop models of the computational
+    processes that store the system-level target state for swarm behavior
+    <d-cite key="doi:10.1162/isal_a_00043, PIETAK201852, doi:10.1162/isal_a_00041, doi:10.1162/isal_a_029"></d-cite>, so that efficient strategies can be developed for rationally editing this
+    information structure, resulting in desired large-scale outcomes (thus
+    defeating the inverse problem that holds back regenerative medicine and many
+    other advances).
+  </p>
+  <h3>Engineering and machine learning</h3>
+  <p>
+    The models described in this article run on the powerful GPU of a modern
+    computer or a smartphone. Yet, let’s speculate about what a “more physical”
+    implementation of such a system could look like. We can imagine it as a grid
+    of tiny independent computers, simulating individual cells. Each of those
+    computers would require approximately 10Kb of ROM to store the “cell
+    genome”: neural network weights and the control code, and about 256 bytes of
+    RAM for the cell state and intermediate activations. The cells must be able
+    to communicate their 16-value state vectors to neighbors. Each cell would
+    also require an RGB-diode to display the color of the pixel it represents. A
+    single cell update would require about 10k multiply-add operations and does
+    not have to be synchronised across the grid. We propose that cells might
+    wait for random time intervals between updates. The system described above
+    is uniform and decentralised. Yet, our method provides a way to program it
+    to reach the predefined global state, and recover this state in case of
+    multi-element failures and restarts. We therefore conjecture this kind of
+    modeling may be used for designing reliable, self-organising agents. On the
+    more theoretical machine learning front, we show an instance of a
+    decentralized model able to accomplish remarkably complex tasks. We believe
+    this direction to be opposite to the more traditional global modeling used
+    in the majority of contemporary work in the deep learning field, and we hope
+    this work to be an inspiration to explore more decentralized learning
+    modeling.
+  </p>
+
+</d-article>
+
+<d-appendix>
+
+  <!--ACKNOWLEDGEMENTS
+  <h3>Acknowledgments</h3>
+  <p>
+    We would like to thank Blaise Aguera y Arcas for his support, as well as for
+    teasing our work in his excellent 2019 talk at NeurIPS
+    <d-cite key="SocialIntelligence"></d-cite>. We also thank Jyrki Alakuijala
+    for his continuous support. We thank Damien Henry, Mark Sandler, Sean Silva
+    and Bert Chan for their review of our early drafts, and Andrew Jackson for
+    proofreading the text.
+  </p>
+
+  <p>
+    On the Distill side, we are especially grateful to Chris Olah for reviewing
+    the article draft, insightful comments on text and diagrams, and general
+    support of the publication.
+  </p>
+-->
+
+
+   <!--AUTHOR CONTRIB
+  <h3>Author Contributions</h3>
+  <p>
+    <strong>Research:</strong> Alexander came up with the Self-Organising
+    Asynchronous Neural Cellular Automata model and Ettore contributed to its
+    design. Ettore designed and performed most of the experiments for this work.
+    Alexander supervised the entire process and contributed extensively to the
+    later stages of development by performing experiments and refining the
+    model.
+  </p>
+
+  <p>
+    The idea of applying neural networks to understanding regeneration, and to
+    designing self-organising systems, was proposed by Michael Levin in his
+    email to Alexander, that was sent following the DeepDream
+    <d-cite key="mordvintsev2015inceptionism"></d-cite> publication by Alexander
+    in 2015. Alexander’s proposal of this model and this work were inspired by
+    the talk <d-cite key="WhatBodiesThink"></d-cite> given by Michael at NeurIPS
+    2018 as well as the subsequent email exchange between Alexander and Michael.
+  </p>
+
+  <p>
+    <strong>Writing &amp; Diagrams:</strong> Alexander outlined the structure of the
+    article, and contributed to the content throughout. Ettore contributed to
+    the content throughout. Eyvind drew all the diagrams, contributed to the
+    content throughout, and wrote all of the pseudocode. Michael made extensive
+    contributions to the article text, providing the biological context and
+    motivation for this work.
+  </p>
+   -->
+<!-- This is a comment in HTML -->
+
+  <!--FOOTNOTES -->
+  <d-footnote-list></d-footnote-list>
+
+  <!--REFERENCES-->
+  <d-citation-list distill-prerendered="true">
+  <h3 id="references">References</h3><ol id="references-list" class="references"><li id="PezzuloGiovanniLevin2016"><span class="title">Top-down models in biology: explanation and control of complex living systems above the molecular level</span>   <a href="https://royalsocietypublishing.org/doi/abs/10.1098/rsif.2016.0555">[link]</a><br>Pezzulo, G. and Levin, M., 2016. Journal of The Royal Society Interface, Vol 13(124), pp. 20160555.  <a href="https://doi.org/10.1098/rsif.2016.0555" style="text-decoration:inherit;">DOI: 10.1098/rsif.2016.0555</a></li>
+    <li id="mordvintsev2015inceptionism"><span class="title">Inceptionism: Going deeper into neural networks</span>   <a href="https://research.googleblog.com/2015/06/inceptionism-going-deeper-into-neural.html">[HTML]</a><br>Mordvintsev, A., Olah, C. and Tyka, M., 2015. Google Research Blog. </li></ol>
+  </d-citation-list>
+
+</d-appendix>
+</body>
+
+<!--FOOTER
+<distill-footer>
+<div class="footer-container">
+  <div class="nav">
+    <a href="https://github.com/distillpub">GitHub</a>
+  </div>
+</div>
+
+</distill-footer>
+->
