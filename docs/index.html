@@ -82,11 +82,11 @@
   <nav class="l-text toc figcaption">
     <h3>Contents</h3>
     <div><a href="#model">Model</a></div>
-    <div><a href="#experiment-1">Experiments</a></div>
+    <div><a href="#experiment-0">Tower Domain Experiments</a></div>
     <ul>
-      <li><a href="#experiment-1">Ablation Experiment</a></li>
-      <li><a href="#experiment-2">Bias Experiment</a></li>
-      <li><a href="#experiment-3">Novelty-Diversity Trade Off</a></li>
+      <li><a href="#experiment-1">Experiment 1: Bias Experiment</a></li>
+      <li><a href="#experiment-2">Experiment 2: Novelty-Diversity Trade Off</a></li>
+      <li><a href="#experiment-3">Experiment 3: Ablation Experiment </a></li>
     </ul>
     <div><a href="#discussion">Discussion</a></div>
   </nav>
@@ -133,17 +133,18 @@
 
   <h2 id="model">Model</h2>
   <p>
-    Those in engineering disciplines and researchers often use many kinds of
-    simulations incorporating local interaction, including systems of partial
-    derivative equation (PDEs), particle systems, and various kinds of Cellular
-    Automata (CA). We will focus on Cellular Automata models as a roadmap for
-    the effort of identifying cell-level rules which give rise to complex,
-    regenerative behavior of the collective. CAs typically consist of a grid of
-    cells being iteratively updated, with the same set of rules being applied to
-    each cell at every step. The new state of a cell depends only on the states
-    of the few cells in its immediate neighborhood. Despite their apparent
-    simplicity, CAs often demonstrate rich, interesting behaviours, and have a
-    long history of being applied to modeling biological phenomena.
+    As DreamCoder, OED consists of both a neural and a symbolic component bootstrapping each other:
+  L, hierarchical symbolic library of programs, capturing regularities in elites across niches
+  Q, neural model guiding the search for efficient and novel programs.
+  As schematized in Figure 1, OED learns
+  through an iterative process alternating generation, selection, abstraction and training steps: at each iteration, elites
+  programs are selected and organised by niches, before possibly being abstracted in the library-learning stage. The
+  core differences with DreamCoder, detailed in the following paragraphs, are meant to encourage diversity both in
+  the generation and abstraction phase, such as: (i) supervision relaxation via QD framework (ii) controllable
+  exploration and stochasticity in the generation phase,
+  (iii) novelty-selection phase (iv) stochastic pruning and
+  novelty-filtering in the abstraction phase.
+
   </p>
 
 
@@ -155,224 +156,314 @@
         width: 100%;
         max-width: 2000px;
       ">
-      <object data="figures/model.svg" type="image/svg+xml" style="width: 100%"></object>
-      <figcaption style="">A single update step of the model.</figcaption>
+      <img src="figures/OED.png" style="width: 300px">
+      <figcaption> Open-Ended Dreamer follows an open-ended
+        neuro-symbolic iterative process. (1) Neurally Guided Generation: by auto-regressively querying the neural model QL,
+        programs are generated for each niche; (2) Novelty Selection: most novel programs are selected to form the elites (3) Abstraction across niches: refactored elites are
+        abstracted to grow a library L of programmatic abstractions;
+        (4) Neural Training: consolidate the neural guidance on both
+        replays and sampled programs.</figcaption>
     </figure>
   <p></p>
 
 
+
   <p>
-    The alpha channel (<span><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>α</mi></mrow><annotation encoding="application/x-tex">\alpha</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.43056em;"></span><span class="strut bottom" style="height:0.43056em;vertical-align:0em;"></span><span class="base"><span class="mord mathit" style="margin-right:0.0037em;">α</span></span></span></span></span>) has a special meaning: it demarcates living
-    cells, those belonging to the pattern being grown. In particular, cells
-    having <span><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>α</mi><mo>&gt;</mo><mn>0</mn><mi mathvariant="normal">.</mi><mn>1</mn></mrow><annotation encoding="application/x-tex">\alpha &gt; 0.1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.64444em;"></span><span class="strut bottom" style="height:0.68354em;vertical-align:-0.0391em;"></span><span class="base"><span class="mord mathit" style="margin-right:0.0037em;">α</span><span class="mrel">&gt;</span><span class="mord mathrm">0</span><span class="mord mathrm">.</span><span class="mord mathrm">1</span></span></span></span></span> and their neighbors are considered “living”. Other
-    cells are “dead” or empty and have their state vector values explicitly set
-    to 0.0 at each time step. Thus cells with <span><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>α</mi><mo>&gt;</mo><mn>0</mn><mi mathvariant="normal">.</mi><mn>1</mn></mrow><annotation encoding="application/x-tex">\alpha &gt; 0.1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.64444em;"></span><span class="strut bottom" style="height:0.68354em;vertical-align:-0.0391em;"></span><span class="base"><span class="mord mathit" style="margin-right:0.0037em;">α</span><span class="mrel">&gt;</span><span class="mord mathrm">0</span><span class="mord mathrm">.</span><span class="mord mathrm">1</span></span></span></span></span> can be thought of
-    as “mature”, while their neighbors with <span><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>α</mi><mo>≤</mo><mn>0</mn><mi mathvariant="normal">.</mi><mn>1</mn></mrow><annotation encoding="application/x-tex">\alpha \leq 0.1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.64444em;"></span><span class="strut bottom" style="height:0.78041em;vertical-align:-0.13597em;"></span><span class="base"><span class="mord mathit" style="margin-right:0.0037em;">α</span><span class="mrel">≤</span><span class="mord mathrm">0</span><span class="mord mathrm">.</span><span class="mord mathrm">1</span></span></span></span></span> are “growing”, and
-    can become mature if their alpha passes the 0.1 threshold.
+    <strong>Supervision Relaxation via Quality Diversity</strong> 
+     By adopting a QD approach, OED relaxes DreamCoder’s supervision needs by eliminating the requirement for handpicking
+    tasks. Following MAP-Elites (Mouret and Clune, 2015),
+    OED keeps track of a multi-dimensional archive of phenotypic elites A, cut into niches along some predefined behavioral characteristics. In our experiments, we use 3D behavioral features (G, W, B) composed of gravity-center (height
+    of) G, width W, and number of blocks B of the structure
+    generated. Each dimension is split in 4, to create a total of
+    4 ∗ 4 ∗ 4 = 64 niches. For instance, a program belongs
+    to the niche [0, 2, 1] if its gravity center (y-coordinate) is
+    ∈ [0, MG/4[, its width ∈ [MW /2, 3MW /4[ and its number of blocks ∈ [MB/4, MB/2[, where MG, MW , MB are
+    upper boundaries set for each feature dimension (e.g. 120,
+    240 and 400 in our experiments).
   </p>
 
-  <figure>
-    <img src="figures/alive2.svg" style="width: 300px">
-    <figcaption>
-      <span><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mover accent="true"><mrow><mi>s</mi><mi>t</mi><mi>a</mi><mi>t</mi><mi>e</mi></mrow><mo>⃗</mo></mover><mo>→</mo><mn>0</mn><mi mathvariant="normal">.</mi><mn>0</mn><mn>0</mn></mrow><annotation encoding="application/x-tex">\vec{state} \rightarrow 0.00</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.89852em;"></span><span class="strut bottom" style="height:0.89852em;vertical-align:0em;"></span><span class="base"><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.89852em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathit">s</span><span class="mord mathit">t</span><span class="mord mathit">a</span><span class="mord mathit">t</span><span class="mord mathit">e</span></span></span><span style="top:-3.18408em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body accent-vec" style="margin-left:0em;"><span>⃗</span></span></span></span></span></span></span><span class="mrel">→</span><span class="mord mathrm">0</span><span class="mord mathrm">.</span><span class="mord mathrm">0</span><span class="mord mathrm">0</span></span></span></span></span> when no neighbour with <span><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>α</mi><mo>&gt;</mo><mn>0</mn><mi mathvariant="normal">.</mi><mn>1</mn><mn>0</mn></mrow><annotation encoding="application/x-tex">\alpha &gt; 0.10</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.64444em;"></span><span class="strut bottom" style="height:0.68354em;vertical-align:-0.0391em;"></span><span class="base"><span class="mord mathit" style="margin-right:0.0037em;">α</span><span class="mrel">&gt;</span><span class="mord mathrm">0</span><span class="mord mathrm">.</span><span class="mord mathrm">1</span><span class="mord mathrm">0</span></span></span></span></span>
-    </figcaption>
+
+
+  <p>
+    <strong>Generation with Exploration</strong> 
+  Both a top-down generation phase following the
+generative model induced by the library L, and a bottomup generation phase 
+following the conditional neural model
+Q_L takes place at different stages in each iteration. Each
+generation phase encompassing an enumeration procedure
+and a sampling procedure. In the enumeration, similarly to
+DreamCoder, programs ρ are enumerated in decreasing posterior probability order in each niche:
+arg max ρ∈z P(ρ | z, L) ∝ P(z | ρ) | {z } if fits in the niche P(ρ | L) | {z }
+how likely in library , (1) where z denotes a niche, ρ a program, L the library. The
+likelihood P(z | ρ) evaluates if a program ρ fits in a given
+niche z (i.e. 1 if it belongs to the niche, 0 else, as we opt
+for a discrete niche criteria), and the prior P(ρ | L) reflects
+how they fit in the library, i.e. how likely they are under the
+generative model L. More details about this enumeration
+procedure, which mixes best-first search with depth-first can
+be found in DreamCoder (Ellis et al., 2021), Algorithm 3.
+To encourage further exploration, OED incorporates a
+sampling from the library L (for the top down phase) or from
+neural model Q (for the bottom up phase). An exploration
+ratio α ∈ [0, 1] enables to balance between exploration and
+exploitation, by scaling up or down the amount of sampled
+programs relative to the amount of enumerated programs at
+each iteration. While the enumeration procedure aims to
+find the most efficient programs (via posterior-optimisation),
+the sampling procedure enables wider exploration, by relaxing this 
+optimisation into a minimal criteria on the posterior: P(ρ | L, z) ≥ δ
+ef f . Adjusting the exploration ratio
+α, and the sampling temperature parameter τ (Boltzman Exploration) 
+enables to balance the efficiency pressure and the
+novelty pressure, as illustrated in our experiments
+  </p>
+
+
+  <p>
+    <strong>Novelty Selection</strong> At each iteration, the most
+    novel programs are selected from previously generated programs (top down and bottom up frontiers), 
+    to form the elites
+    E, under the condition that their novelty score is above a
+novelty threshold δ nov. The local novelty score of a program ρ in a niche z 
+is measured as the k-mean of the phenotypic
+distance to the archive elements of the same niche.
+Top-N programs are selected one-by-one for the sampled
+niche, and at each step, the novelty score of each candidate
+is re-evaluated to adapt to the growing niche.
+To capture interesting variations between structures, instead of a naive pixel-based
+distance, we rely on a pre-trained visual network6
+, illustrated Figure 3. The phenotypic features fρ ∈ R d of a program ρ
+are defined as the visual CNN-features of the block structure
+it corresponds to (obtained after executing the program and
+rendering it as an image), using a pretrained CNN (VGG 16
+Simonyan and Zisserman (2014)). The phenotypic distance
+is then defined as the euclidean distance between the CNN
+features:
+  </p>
+
+
+  <p>
+    <strong>Abstraction</strong> In essence, the abstraction phase aims to
+    grow the library from useful and novel building blocks found
+    in elites programs across niches. The abstraction phase,
+    first refactors the elites to find common program fragments,
+    before abstracting these into new programs
+    <d-footnote>This sequestration of information into reusable units –
+      abstractions– is a form of <i>knowledge distillation.</i></d-footnote>
+    . These abstracted programs –referred to as primitives (to distinguish
+    them from generated programs)– are functions with maximum 3 arguments in our experiments. It relies on the selfsupervised compression algorithm from DreamCoder (Ellis
+    et al., 2021) (cf. Appendix S4.5) which aims to maximize
+    a Bayesian criterion, through a generalised Expectation Maximisation algorithm.
+    To encourage a more evolving library, soften the language-bias, and incorporate additional stochasticity
+    <d-footnote>Stochasticity, instabilities, and the possibility of historical contingencies seems to be tied to the emergence of innovation, as argued in Taylor et al. (2016).</d-footnote>
+    , OED includes a stochastic pruning mechanism, weighted by innovation persistence:
+    every iteration, a weighted sampling of ≤ β primitives to
+    prune is performed (β = 2, 3 in our experiments). The sampling weights corresponds to the activity score of each primitive at the current iteration, as defined in Equation 6. We
+    also incorporate a novelty-guided library minimal criteria,
+    enforcing the new primitives to be distant enough from the
+    existing primitives, relying on a point-based approximation
+    defined in Equation 5 and illustrated Figure 3.
+    <d-footnote>Distance between primitives (function): first,
+      we sample for each primitive a set Cˆ
+      p of mp ≤ 20 programs  obtained by instantiating p on arguments ∈ {0, 9}. 
+      The approximate distance between primitives is then defined as the
+      mean over programs in p-cloud of the distance to the p
+      ′−cloud.</d-footnote>
+    
+  </p>
+
+
+  <p>
+    <strong>Abstraction</strong> The neural model, illustrated in Figure 2, aims to learn how to compose the programmatic abstraction to create novel programs. It encodes a distribution
+    over the elements in the library conditioned on the local context: taking as input a latent niche vector z, and the current
+    state s passed as an image (e.g. image of the current tower
+being constructed), it outputs a probability tensor encoding
+the probability of a next token being j given the previous token in the growing language. Querying the neural model Q
+auto-regressively produces a program. It is trained both on
+replays –i.e. elites from previous iterations– and dreams –i.e
+programs sampled from the generative model, with a default
+dream ratio of 0.5. It plays the crucial role of biasing the
+search space, as it drastically reduces the breadth of search
+in the combinatorially exploding space of programs.
+
+  </p>
+
+  <h2 id="experiment-0">Experiments: Tower Domain</h2>
+  <p>
+    We demonstrate our algorithm on the
+Tower Domain introduced in DreamCoder (Ellis et al.
+(2021), Appendix S2.1.4). We rely on the same monadic,
+continuation-passing encoding of imperative programs. In
+this domain, the programs produce a sequence of actions,
+which encode the instruction of a hand moving over a 2D
+discretized canvas, which can drop horizontal or vertical
+blocks. The state of the hand includes both a 1D position and a boolean orientation. By default, the initial Library is seeded with two basic control flow primitives: for
+(for loop), and get/set which gets and saves the current
+state of the agent’s hand. We also provide movement-related
+and construction-related primitives: moveHand (advancing the hand), reverseHand (flipping the orientation),
+dropVerticalBlock and dropHorizontalBlock.
+To define the niches, we adopt a 3D behavioral characteristic, consisting of (1) center of gravity (y-coordinate) (2)
+width, and (3) number of blocks of the tower structure generated from a program. The ecosystem minimal criteria consists of lower and upper bounds to these values (e.g. 0−120,
+0 − 240 and 10 − 400).
+  </p>
+
+
+  <h2 id="experiment-1">Experiment 1: Bias Experiment</h2>
+
+
+  <p>
+    The emphasis on implementation nested in the notion of innovation implies the candidate
+novel artifacts-ideas will likely undergo strong environmental pressures (e.g. market pressure, functional pressures, social pressures etc.) when being put at test in the real world,
+heavily biasing the search space. It seems therefore legitimate to wonder if strong inductive biases and environmental
+coupling are key to guide the emergence of abstract structured knowledge and innovation. Generating and retaining
+’stepping stones to everywhere’ seems indeed too ambitious
+in such a combinatorially exploding space of programs in
+the absence of any environmental pressure (what survive,
+what functions, etc.). Combining such quest with some inductive bias appears to be a more realistic reflection of how
+symbolic knowledge formation occurs in social and natural
+systems. Moreover, it holds the potential for yielding more
+reliable and consistent innovations. We investigate different
+ways to bias evolution and guide the formation of symbolic
+knowledge, through either: . (INNATE)-bootstrapped Library, initially seeded with 5 primitives, 
+(PHYSICS) a gravity-aware enviroment, enacting strong environmental pressure,
+(CNN)-pretrained distance metric for novelty evaluation.
+
+  </p>
+
+  <h2 id="experiment-2">Experiment 2: Novelty-Diversity Trade Off</h2>
+
+  <p>
+  </p><figure style="
+      margin-left: auto;
+      margin-right: auto;
+      grid-column: page;
+      width: 100%;
+      max-width: 2000px;
+    ">
+    <img src="figures/Pressures.png" style="width: 300px">
+    <figcaption> The environmental, language and novelty pres-
+      sures at play in the selection of generated programs at each
+      iteration. (1) Legit programs (grammatically correct) un-
+      dergo environmental pressures (e.g. niches and minimal cri-
+      teria on the number of blocks, width, etc.), enclosed in the
+      likelihood P(z | ρ); (2) Candidates programs undergo a
+      language-pressure, deriving from the learned library L, en-
+      acted through the prior P(ρ | L); (3) finally, generated pro-
+      grams are subjected to a novelty selection.</figcaption>
   </figure>
+<p></p>
+  <p>
+    As illustrated Figure 8, at the core of OED search for
+diversity-enabling programs –and at the core of open-
+endedness– lies a delicate balance between environmental,
+efficiency and novelty pressures. These different pressures
+at play to select elites at each iteration may be conflictive:
+e.g. novel solutions compared to the archive commonly
+stands out as less likely given the library (therefore, less ef-
+ficient) and conversely, most efficient programs (minimising
+the prior P(ρ | L)), often are less novel
+  </p>
+  <p>
+    <strong>Convergent Evolution</strong> Strong efficiency pressures, either
+    from environmental constraints (cf. (PHYSICS)), or via
+    stronger language-pressure (cf. (BASE)), or conversely
+    lower novelty pressure (as in the (A-N) run), seem to favor
+    phenomenon of convergent evolution, i.e. the repeatability
+    of certain evolutionary outcomes. Indeed, certain programs
+    and primitives were (approximately) reinvented across dif-
+    ferent evolutionary runs, as they appeared to be some of the
+    most efficient way to inhabit certain ecological niches and
+    fit the minimal criteria (notably when this one is more de-
+    manding as in the gravity-aware environment): e.g. slanted
+    lines, cranes-type structure, parallelograms, comb-like arti-
+    fact, wall-type of structures, and combinations of them (as
+    displayed in Figure 5) were invented across multiple runs
 
+  </p>
+
+  <p>
+    <strong>Enhanced Exploration</strong> 
+    As qualitatively reflected in the
+programs invented or abstracted (Figures 4, Figure 5), learn-
+ing a language also implies learning a strong inductive bias
+towards the search space. This language bias is notably en-
+acted through the prior P(ρ | L) pressure in the generation
+step. Under a strong language bias, early primitives incor-
+porated in the library (e.g. the noticeable ”zigzag” artifact in
+the (BASE) run added to the library at the second iteration,
+cf. Figure 5) have a strong effect on the generation of new
+programs in later runs.
+To mitigate such effect, OED provide ways to loosen the
+efficiency pressure in favor of the novelty pressure, by pro-
+moting exploration in the generation step, notably through
+increasing the exploration ratio α weighting the sampling
+or the sampling temperature τ 9. As qualitatively reflected
+Figure 9, early experiments on this enhanced exploration
+confirm that more diverse and novel programs are gener-
+ated. However, by reducing the presence of regularities
+among elites, excessive exploration can impede the abstrac-
+tion phase and therefore the library growing
+
+  </p>
   
-
+  <h2 id="experiment-3">Experiment 3: Ablation Experiment</h2>
   <p>
-    <strong>Perception.</strong> This step defines what each cell perceives of
-    the environment surrounding it. We implement this via a 3x3 convolution with
-    a fixed kernel. One may argue that defining this kernel is superfluous -
-    after all we could simply have the cell learn the requisite perception
-    kernel coefficients. Our choice of fixed operations are motivated by the
-    fact that real life cells often rely only on chemical gradients to guide the
-    organism development. Thus, we are using classical Sobel filters to estimate
-    the partial derivatives of cell state channels in the <span><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mover accent="true"><mrow><mi>x</mi></mrow><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{x}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.71444em;"></span><span class="strut bottom" style="height:0.71444em;vertical-align:0em;"></span><span class="base"><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.71444em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathit">x</span></span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body accent-vec" style="margin-left:0.05556em;"><span>⃗</span></span></span></span></span></span></span></span></span></span></span> and
-    <span><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mover accent="true"><mrow><mi>y</mi></mrow><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{y}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.71444em;"></span><span class="strut bottom" style="height:0.9088799999999999em;vertical-align:-0.19444em;"></span><span class="base"><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.71444em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathit" style="margin-right:0.03588em;">y</span></span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body accent-vec" style="margin-left:0.11112em;"><span>⃗</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.19444em;"></span></span></span></span></span></span></span></span> directions, forming a 2D gradient vector in each direction, for
-    each state channel. We concatenate those gradients with the cells own
-    states, forming a <span><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>1</mn><mn>6</mn><mo>∗</mo><mn>2</mn><mo>+</mo><mn>1</mn><mn>6</mn><mo>=</mo><mn>4</mn><mn>8</mn></mrow><annotation encoding="application/x-tex">16*2+16=48</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.64444em;"></span><span class="strut bottom" style="height:0.72777em;vertical-align:-0.08333em;"></span><span class="base"><span class="mord mathrm">1</span><span class="mord mathrm">6</span><span class="mbin">∗</span><span class="mord mathrm">2</span><span class="mbin">+</span><span class="mord mathrm">1</span><span class="mord mathrm">6</span><span class="mrel">=</span><span class="mord mathrm">4</span><span class="mord mathrm">8</span></span></span></span></span> dimensional <i>perception vector</i>, or
-    rather <i>percepted vector, </i>for each cell.
-  </p>
-
-  <d-code block="" language="python">
-    <p>def perceive(state_grid):</p>
-    <p>sobel_x = [[-1, 0, +1],</p>
-    <p>[-2, 0, +2],</p>
-    <p>[-1, 0, +1]]</p>
-    <p>sobel_y = transpose(sobel_x)</p>
-    <p># Convolve sobel filters with states</p>
-    <p># in x, y and channel dimension.</p>
-    <p>grad_x = conv2d(sobel_x, state_grid)</p>
-    <p>grad_y = conv2d(sobel_y, state_grid)</p>
-    <p># Concatenate the cell’s state channels,</p>
-    <p># the gradients of channels in x and</p>
-    <p># the gradient of channels in y.</p>
-    <p>perception_grid = concat(</p>
-    <p>state_grid, grad_x, grad_y, axis=2)</p>
-    <p>return perception_grid</p>
-  </d-code>
-
-  <p>
-    <strong>Update rule.</strong> Each cell now applies a series of operations
-    to the perception vector, consisting of typical differentiable programming
-    building blocks, such as 1x1-convolutions and ReLU nonlinearities, which we
-    call the cell’s “update rule”. Recall that the update rule is learned, but
-    every cell runs the same update rule. The network parametrizing this update
-    rule consists of approximately 8,000 parameters. Inspired by residual neural
-    networks, the update rule outputs an incremental update to the cell’s state,
-    which applied to the cell before the next time step. The update rule is
-    designed to exhibit “do-nothing” initial behaviour - implemented by
-    initializing the weights of the final convolutional layer in the update rule
-    with zero. We also forego applying a ReLU to the output of the last layer of
-    the update rule as the incremental updates to the cell state must
-    necessarily be able to both add or subtract from the state.
-  </p>
-
-  <d-code block="" language="python">
-    <p>def update(perception_vector):</p>
-    <p># The following pseudocode operates on</p>
-    <p># a single cell’s perception vector.</p>
-    <p># Our reference implementation uses 1D</p>
-    <p># convolutions for performance reasons.</p>
-    <p>x = dense(perception_vector, output_len=128)</p>
-    <p>x = relu(x)</p>
-    <p>ds = dense(x, output_len=16, weights_init=0.0)</p>
-    <p>return ds</p>
-  </d-code>
-
-  <p>
-    <strong>Stochastic cell update.</strong> Typical cellular automata update
-    all cells simultaneously. This implies the existence of a global clock,
-    synchronizing all cells. Relying on global synchronisation is not something
-    one expects from a self-organising system. We relax this requirement by
-    assuming that each cell performs an update independently, waiting for a
-    random time interval between updates. To model this behaviour we apply a
-    random per-cell mask to update vectors, setting all update values to zero
-    with some predefined probability (we use 0.5 during training). This
-    operation can be also seen as an application of per-cell dropout to update
-    vectors.
-  </p>
-
-
-  <h2 id="experiment-1">Experiment 1: Learning to Grow</h2>
-  <p>
-    </p><figure style="
-        margin-left: auto;
-        margin-right: auto;
-        grid-column: page;
-        width: 100%;
-        max-width: 900px;
-      ">
-      <object data="figures/training.svg" type="image/svg+xml" style="width: 100%"></object>
-      <figcaption>Training regime for learning a target pattern.</figcaption>
-    </figure>
-  <p></p>
-  <p>
-    In our first experiment, we simply train the CA to achieve a target image
-    after a random number of updates. This approach is quite naive and will run
-    into issues. But the challenges it surfaces will help us refine future
-    attempts.
-  </p>
-
-  <p>
-    We initialize the grid with zeros, except a single seed cell in the center,
-    which will have all channels except RGB<d-footnote>
-      We set RGB channels of the seed to zero because we want it to be visible
-      on the white background.</d-footnote>
-    set to one. Once the grid is initialized, we iteratively apply the update
-    rule. We sample a random number of CA steps from the [64, 96]<d-footnote>
-      This should be a sufficient number of steps to grow the pattern of the
-      size we work with (40x40), even considering the stochastic nature of our
-      update rule.</d-footnote>
-    range for each training step, as we want the pattern to be stable across a
-    number of iterations. At the last step we apply pixel-wise L2 loss between
-    RGBA channels in the grid and the target pattern. This loss can be
-    differentiably optimized<d-footnote>
-      We observed training instabilities, that were manifesting themselves as
-      sudden jumps of the loss value in the later stages of the training. We
-      managed to mitigate them by applying per-variable L2 normalization to
-      parameter gradients. This may have the effect similar to the weight
-      
-  </p>
-
-
-  <p>
-    </p><figure>
-      <video loop="" autoplay="" playsinline="" muted="" width="640px">
-        <source src="figures/unstable.mp4" type="video/mp4">
-        Your browser does not support the video tag.
-      </video>
-      <figcaption>
-        Many of the patterns exhibit instability for longer time periods.
-        <br><br>
-      </figcaption>
-    </figure>
-  <p></p>
-
-
-  <h2 id="experiment-2">Experiment 2: What persists, exists</h2>
-  <p>
-    One way of understanding why the previous experiment was unstable is to draw
-    a parallel to dynamical systems. We can consider every cell to be a
-    dynamical system, with each cell sharing the same dynamics, and all cells
-    being locally coupled amongst themselves. When we train our cell update
-    model we are adjusting these dynamics. Our goal is to find dynamics that
-    satisfy a number of properties. Initially, we wanted the system to evolve
-    from the seed pattern to the target pattern - a trajectory which we achieved
-    in Experiment 1. Now, we want to avoid the instability we observed - which
-    in our dynamical system metaphor consists of making the target pattern an
-    attractor.
+    To assess the benefit of the different components of our
+    model in the open-ended creation of diverse programs,
+    we run several ablation studies both (A-L) without the li-
+    brary, (A-R) without the neural guidance, (A-N) without the
+    novelty-Selection phase. Comparative results are presented
+    in Figure 10. Qualitative results in Figure 4, 5 confirms
+    quantitative results in terms of the overall impoverishment
+    of found solutions in these ablation experiments.
   </p>
 
   
-  <h2 id="experiment-3">Experiment 3: Rotating the perceptive field</h2>
-  <p>
-    As previously described, we model the cell’s perception of its neighbouring
-    cells by estimating the gradients of state channels in <span><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mover accent="true"><mrow><mi>x</mi></mrow><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{x}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.71444em;"></span><span class="strut bottom" style="height:0.71444em;vertical-align:0em;"></span><span class="base"><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.71444em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathit">x</span></span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body accent-vec" style="margin-left:0.05556em;"><span>⃗</span></span></span></span></span></span></span></span></span></span></span> and
-    <span><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mover accent="true"><mrow><mi>y</mi></mrow><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{y}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.71444em;"></span><span class="strut bottom" style="height:0.9088799999999999em;vertical-align:-0.19444em;"></span><span class="base"><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.71444em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathit" style="margin-right:0.03588em;">y</span></span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body accent-vec" style="margin-left:0.11112em;"><span>⃗</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.19444em;"></span></span></span></span></span></span></span></span> using Sobel filters. A convenient analogy is that each agent has
-    two sensors (chemosensory receptors, for instance) pointing in orthogonal
-    directions that can sense the gradients in the concentration of certain
-    chemicals along the axis of the sensor. What happens if we rotate those
-    sensors? We can do this by rotating the Sobel kernels.
-  </p>
-
-  
-  <h2 id="discussion">Discussion</h2>
-  <h3>Embryogenetic Modeling</h3>
+  <h2 id="discussion">Conclusion</h2>
 
   <p>
-    This article describes a toy embryogenesis and regeneration model. This is a
-    major direction for future work, with many applications in biology and
-    beyond.
-  </p>
-  <h3>Engineering and machine learning</h3>
-  <p>
-    The models described in this article run on the powerful GPU of a modern
-    computer or a smartphone.
+    While preliminary, our results suggest that neurally-guided
+library learning, enabling both more efficient program dis-
+covery and more sustained diversity is a promising framing
+towards open-endedness. By building a library of program-
+matic abstractions —instead of solutions—, our method
+preserves regularities in a more potent and versatile way than
+other diversity-oriented approaches. As we have observed,
+OED has the potential to guide the development of sym-
+bolic knowledge using innate priors, biased metrics, and en-
+vironmental constraints. Accentuating efficiency pressures,
+such as language-bias and environmental factors, led to phe-
+nomenon of convergent evolution. Library learning entails
+a growing amount of bias, which may have a negative im-
+pact on diversity. To mitigate this effect, and foster cre-
+ative divergence, it seems crucial to promote exploration
+and stochasticity, both during the generation and abstraction
+phases. However, by reducing the presence of regularities
+among elites, excessive exploration may impede the abstrac-
+tion mechanism. Further investigation is necessary to deter-
+mine the optimal balance between exploration and efficiency
+in library learning, which could be automatically adjusted
+depending on the task. The simplicity of the Tower Domain
+task do not allow OED to reach its full potential for open-
+ended creation. To unleash its full capabilities, and the bene-
+fit of novelty-oriented library learning model in downstream
+tasks, OED should be deployed in richer environments with
+stronger environmental coupling and functional objectives.
+Another compelling development would be to use OED for
+the production of increasingly sophisticated behaviors, in-
+stead of simply artifacts.
   </p>
 
 </d-article>
 
 <d-appendix>
 
-  <!--ACKNOWLEDGEMENTS
   <h3>Acknowledgments</h3>
   <p>
-    We would like to thank Blaise Aguera y Arcas for his support, as well as for
-    teasing our work in his excellent 2019 talk at NeurIPS
-    <d-cite key="SocialIntelligence"></d-cite>. We also thank Jyrki Alakuijala
-    for his continuous support. We thank Damien Henry, Mark Sandler, Sean Silva
-    and Bert Chan for their review of our early drafts, and Andrew Jackson for
-    proofreading the text.
+    This project was funded by a DFF-Research Project grant
+(9131 − 00042B)
   </p>
 
-  <p>
-    On the Distill side, we are especially grateful to Chris Olah for reviewing
-    the article draft, insightful comments on text and diagrams, and general
-    support of the publication.
-  </p>
--->
 
 
    <!--AUTHOR CONTRIB
