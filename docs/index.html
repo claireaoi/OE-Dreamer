@@ -136,7 +136,7 @@
           flex-direction: column; /* Stack image and caption vertically */
           align-items: center; /* Center items horizontally */
           ">
-          <img src="figures/compositionality.png" style="width: 700px">
+          <img src="figures/compositionality.png" style="width: 800px">
           <figcaption style="text-align: justify; width: 700px;"> <strong>Figure 2: Innovation Scaffoldings:</strong> the emergence of innovation --from genomics to Internet via soccer-- can be schematized through a directed graph structure, where nodes represent artifacts or behaviors, and edges represent the dependency between them.</figcaption>
         </figure>
       </p>
@@ -145,21 +145,21 @@
     <br>
   <p style="text-align: justify;">
     <strong>Program Synthesis with Library Learning</strong>  
-    With the aim to harness compositional power for open-ended innovation, programs appear as a compelling candidate representation.
+   
+    In the pursuit of fostering open-ended innovation and harnessing compositional power, programs appear as a compelling candidate representation.
     Indeed, programs are an adaptive, robust and expressive way to encode both artifacts and behaviors, compelling for their logical, interpretative and extrapolative qualities.
-    Program synthesis, paired with Library Learning, enable to <em>preserve regularities</em> in a potent and versatile way, as functions of certain arity (as abstracted forms of static programs). 
-    <d-footnote>Program synthesis is the task of automatically generating programs from a given specification, e.g. textual or set of inputs-outputs examples.</d-footnote>
+    Program synthesis, paired with Library Learning, can enable to <em>preserve regularities</em> in a potent and versatile way, as functions of certain arity    <d-footnote>Program synthesis is the task of automatically generating programs from a given specification, e.g. textual or set of inputs-outputs examples.</d-footnote>.
     Because of the combinatorial nature of the search space, pure symbolic search is often not judicious, and instead, many recent works have explored how to leverage deep neural networks with program induction, as for instance in <i>neurally-guided program synthesis</i>.
 
     <br>
     <br>
     <strong>DreamCoder</strong>  
     For instance, a neuro-symbolic model like DreamCoder (Ellis et al., 2021) has proven to be versatile in tackling multiple domains via program induction, from creative tasks as logo generation to more classic programming inductive tasks like physical laws regression.
-    Framing learning as program induction, it aims to jointly learn a hierarchical library of building blocks-represented as programs, and the intuition on how to compose them to solve a given task
+    Framing learning as program induction, it aims to jointly learn a hierarchical library of building blocks-represented as programs, and the intuition (neural model) on how to compose them to solve a given task.
     DreamCoder adopts a Bayesian framework, where the library encodes a prior on program and the neural model aims to approximate a Bayesian posterior.
-    
-    This work extends DreamCoder towards open-endedness, with ways to encourage diversity in both program generation and abstraction, but also making it less dependent on supervision. 
-    Our diversity-oriented neuro-symbolic model—Open-Ended Dreamer (OED)— balances efficiency and novelty pressures in order to learn a compact and diverse set of reusable programs, organised in a hierarchical library.
+
+    This work extends DreamCoder towards open-endedness, with ways to encourage diversity in both program generation and abstraction, but also without the need to specify task (relaxed via Quality Diversity approach). 
+    Our diversity-oriented neuro-symbolic model—Open-Ended Dreamer (OED)— balances efficiency and novelty pressures in order to learn a compact set of diversity-enabling programs, organised in a hierarchical library.
   
   </p>
 
@@ -186,16 +186,15 @@
     </p>
 
   <p style="text-align: justify;">
-    As DreamCoder, OED consists of both a neural and a symbolic component bootstrapping each other:
+    As DreamCoder <d-footnote>The core differences with DreamCoder, detailed in the following paragraphs, are meant to encourage diversity both in the generation and abstraction phase, such as: (i) supervision relaxation via QD framework (ii) controllable exploration and stochasticity in the generation phase, (iii) novelty-selection phase (iv) stochastic pruning and novelty-filtering in the abstraction phase.</d-footnote>, OED consists of both a neural and a symbolic component bootstrapping each other:
     <ol>
       <li> L, <i>hierarchical symbolic library</i> of programs, capturing regularities in elites across niches.
         <li> Q_L, <i>neural model</i> guiding the search for efficient and novel programs.
         </ol>
-   As schematized in Figure 3, OED learns through an iterative process alternating <i>generation, selection, abstraction and training steps</i>. 
+      </p>
+        <p style="text-align: justify;">
+  As schematized in Figure 3, OED learns through an iterative process alternating generation, selection, abstraction and training steps. 
    At each iteration, elites programs are selected and organised by niches, before possibly being abstracted in the library-learning stage. 
-  The core differences with DreamCoder, detailed in the following paragraphs, are meant to encourage diversity both in the generation and abstraction phase, such as: (i) supervision relaxation via QD framework (ii) controllable exploration and stochasticity in the generation phase, (iii) novelty-selection phase (iv) stochastic pruning and novelty-filtering in the abstraction phase.
-
-
   </p>
 
 
@@ -218,15 +217,21 @@
     <li> In the enumeration, similarly to DreamCoder, programs ρ are enumerated in decreasing posterior probability order in each niche:
   <d-footnote>More details about this enumeration procedure, which mixes best-first search with depth-first can be found in DreamCoder (Ellis et al., 2021), Algorithm 3.</d-footnote>
   <br>
-  argmax_{ρ ∈ z} P(ρ | z, L) ∝ P(z | ρ) P(ρ | L)
+  <p style="text-align: center;">
+    argmax_{ρ ∈ z} P(ρ | z, L) ∝ P(z | ρ) P(ρ | L)
+  </p>
+  <p style="text-align: justify;">
 <br>
 where z denotes a niche, ρ a program, L the library.
 The likelihood P(z | ρ) evaluates if a program ρ fits in a given niche z, and the prior P(ρ | L) reflects how they fit in the library, i.e. how likely they are under the generative model L. 
 <li>To encourage further exploration, OED incorporates a sampling from the library L (for the top down phase) or from neural model Q_L (for the bottom up phase). 
   While the enumeration procedure aims to find the most efficient programs (via posterior-optimisation), the sampling procedure enables wider exploration, by relaxing this optimisation into a minimal criteria on the posterior: 
 <br>
-P(ρ | L, z) ≥ δ
-<br>
+<p style="text-align: center;">
+  P(ρ | L, z) ≥ δ
+</p>
+<p style="text-align: justify;">
+  <br>
 where δ is a lower bound on the posterior.
 Adjusting the exploration ratio α ∈ [0, 1] (ratio of sampled programs vs enumerated), and the sampling temperature parameter τ (Boltzman Exploration) enables to balance the efficiency pressure, as illustrated in our experiments below.
 </ol>
