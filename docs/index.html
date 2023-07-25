@@ -119,38 +119,49 @@
 
 
   </p>
-   <p>
-    <figure style="
-          margin-left: auto;
-          margin-right: auto;
-          grid-column: page;
-          width: 100%;
-          max-width: 2000px;
-          display: flex; /* Add Flexbox */
-        flex-direction: column; /* Stack image and caption vertically */
-        align-items: center; /* Center items horizontally */
-        ">
-        <img src="figures/compositionality.png" style="width: 800px">
-        <figcaption style="text-align: justify; width: 800px;"> Innovation Scaffoldings: the emergence of innovation --from genomics to Internet via soccer-- can be schematized through a directed graph structure, where nodes represent artifacts or behaviors, and edges represent the dependency between them.</figcaption>
-      </figure>
-    </p>
-
+  
     <p style="text-align: justify;">
    <strong>Compositionality for Open-Endedness</strong>  
-
-    Not only most lifeforms showcase a complex nested and modular structure, a significant part of human knowledge (factual or even procedural) --and human innovation-- exhibit some form of <em>hierarchical and compositional structure</em>. 
-    We relentlessly invent more complex artifacts and behaviors from previous stepping stones —explicit or implicit, collective or individual. 
-    This ability to re-use, combine, transfer or scale previous discoveries is crucial to both human learning and adaptation.
+   Not only do the majority of lifeforms display intricate nested and modular structures, but a considerable portion of human knowledge, whether factual or procedural, also embodies a form of hierarchical and compositional arrangement. 
+   We continually create more sophisticated artifacts and behaviors by building upon previous achievements, whether they are explicit or implicit, originating from collective or individual efforts. 
+   The capacity to reuse, combine, transfer, or expand upon past discoveries plays a pivotal role in human learning and adaptation. 
+   This ability appears essential for fostering open-ended innovation and achieving a certain level of complexity.
+     <p>
+      <figure style="
+            margin-left: auto;
+            margin-right: auto;
+            grid-column: page;
+            width: 100%;
+            max-width: 2000px;
+            display: flex; /* Add Flexbox */
+          flex-direction: column; /* Stack image and caption vertically */
+          align-items: center; /* Center items horizontally */
+          ">
+          <img src="figures/compositionality.png" style="width: 600px">
+          <figcaption style="text-align: justify; width: 600px;"> Innovation Scaffoldings: the emergence of innovation --from genomics to Internet via soccer-- can be schematized through a directed graph structure, where nodes represent artifacts or behaviors, and edges represent the dependency between them.</figcaption>
+        </figure>
+      </p>
+  
     <br>
     <br>
 
     <strong>Program Synthesis with Library Learning</strong>  
-    Methods combining symbolic component with neural learning have shown great potential in grasping forms of compositional generalisation, while providing interpretable representations (Chen et al., 2020; De Raedt et al., 2019).
-    <d-footnote>Programs are an adaptive, robust and expressive way to encode both artifacts and behaviors, compelling for their logical, interpretative and extrapolative qualities.</d-footnote>
-    For instance, a neuro-symbolic model like DreamCoder (Ellis et al., 2021) has proven to be versatile in tackling multiple domains via program induction,from creative tasks as logo generation to more classic programming inductive tasks like physical laws regression.
+    With the aim to harness compositional power for open-ended innovation, programs appear as a compelling candidate representation.
+    Indeed, programs are an adaptive, robust and expressive way to encode both artifacts and behaviors, compelling for their logical, interpretative and extrapolative qualities.
+    Program synthesis, paired with Library Learning, enable to <em>preserve regularities</em> in a potent and versatile way, as functions of certain arity (as abstracted forms of static programs). 
+    <d-footnote>Program synthesis is the task of automatically generating programs from a given specification, e.g. textual or set of inputs-outputs examples.</d-footnote>
+    Because of the combinatorial nature of the search space, pure symbolic search is often not judicious, and instead, many recent works have explored how to leverage deep neural networks with program induction, as for instance in <i>neurally-guided program synthesis</i>.
+
+    <br>
+    <br>
+    <strong>DreamCoder</strong>  
+    For instance, a neuro-symbolic model like DreamCoder (Ellis et al., 2021) has proven to be versatile in tackling multiple domains via program induction, from creative tasks as logo generation to more classic programming inductive tasks like physical laws regression.
+    Framing learning as program induction, it aims to jointly learn a hierarchical library of building blocks-represented as programs, and the intuition on how to compose them to solve a given task
+    DreamCoder adopts a Bayesian framework, where the library encodes a prior on program and the neural model aims to approximate a Bayesian posterior.
+    
     This work extends DreamCoder towards open-endedness, with ways to encourage diversity in both program generation and abstraction, but also making it less dependent on supervision. 
     Our diversity-oriented neuro-symbolic model—Open-Ended Dreamer (OED)— balances efficiency and novelty pressures in order to learn a compact and diverse set of reusable programs, organised in a hierarchical library.
-
+  
   </p>
 
   <h2 id="model">Model</h2>
@@ -177,10 +188,11 @@
 
   <p style="text-align: justify;">
     As DreamCoder, OED consists of both a neural and a symbolic component bootstrapping each other:
-  L, hierarchical symbolic library of programs, capturing regularities in elites across niches
-  Q, neural model guiding the search for efficient and novel programs.
-  As schematized in Figure 1, OED learns
-  through an iterative process alternating generation, selection, abstraction and training steps: at each iteration, elites
+    <ol>
+      <li> L, hierarchical symbolic library of programs, capturing regularities in elites across niches
+        <li> Q, neural model guiding the search for efficient and novel programs.
+        </ol>
+   As schematized in Figure 1, OED learns through an iterative process alternating generation, selection, abstraction and training steps: at each iteration, elites
   programs are selected and organised by niches, before possibly being abstracted in the library-learning stage. The
   core differences with DreamCoder, detailed in the following paragraphs, are meant to encourage diversity both in
   the generation and abstraction phase, such as: (i) supervision relaxation via QD framework (ii) controllable
