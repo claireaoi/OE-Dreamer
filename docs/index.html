@@ -213,55 +213,41 @@
   <p style="text-align: justify;">
     <strong>Generation with Exploration</strong> 
   Both a <i>top-down generation phase</i> following the generative model induced by the library L, and a <i>bottom-up generation phase</i> following the conditional neural model Q_L takes place at different stages in each iteration. 
-  Each generation phase encompassing an enumeration procedure and a sampling procedure. 
-  In the enumeration, similarly to DreamCoder, programs ρ are enumerated in decreasing posterior probability order in each niche:
+  Each generation phase encompasses an enumeration procedure and a sampling procedure. 
+  <ol>
+    <li> In the enumeration, similarly to DreamCoder, programs ρ are enumerated in decreasing posterior probability order in each niche:
   <d-footnote>More details about this enumeration procedure, which mixes best-first search with depth-first can be found in DreamCoder (Ellis et al., 2021), Algorithm 3.</d-footnote>
   <br>
   argmax_{ρ ∈ z} P(ρ | z, L) ∝ P(z | ρ) P(ρ | L)
 <br>
 where z denotes a niche, ρ a program, L the library.
 The likelihood P(z | ρ) evaluates if a program ρ fits in a given niche z, and the prior P(ρ | L) reflects how they fit in the library, i.e. how likely they are under the generative model L. 
-To encourage further exploration, OED incorporates a sampling from the library L (for the top down phase) or from neural model Q_L (for the bottom up phase). 
-While the enumeration procedure aims to find the most efficient programs (via posterior-optimisation), the sampling procedure enables wider exploration, by relaxing this optimisation into a minimal criteria on the posterior: 
+<li>To encourage further exploration, OED incorporates a sampling from the library L (for the top down phase) or from neural model Q_L (for the bottom up phase). 
+  While the enumeration procedure aims to find the most efficient programs (via posterior-optimisation), the sampling procedure enables wider exploration, by relaxing this optimisation into a minimal criteria on the posterior: 
 <br>
 P(ρ | L, z) ≥ δ
 <br>
 where δ is a lower bound on the posterior.
 Adjusting the exploration ratio α ∈ [0, 1] (ratio of sampled programs vs enumerated), and the sampling temperature parameter τ (Boltzman Exploration) enables to balance the efficiency pressure, as illustrated in our experiments below.
+</ol>
 </p>
 
 
   <p style="text-align: justify;">
-    <strong>Novelty Selection</strong> At each iteration, the most
-    novel programs are selected from previously generated programs (top down and bottom up frontiers), 
-    to form the elites
-    E, under the condition that their novelty score is above a
-novelty threshold δ nov. The local novelty score of a program ρ in a niche z 
-is measured as the k-mean of the phenotypic
-distance to the archive elements of the same niche.
-Top-N programs are selected one-by-one for the sampled
-niche, and at each step, the novelty score of each candidate
-is re-evaluated to adapt to the growing niche.
-To capture interesting variations between structures, instead of a naive pixel-based
-distance, we rely on a pre-trained visual network6
-, illustrated Figure 3. The phenotypic features fρ ∈ R d of a program ρ
-are defined as the visual CNN-features of the block structure
-it corresponds to (obtained after executing the program and
-rendering it as an image), using a pretrained CNN (VGG 16
-Simonyan and Zisserman (2014)). The phenotypic distance
-is then defined as the euclidean distance between the CNN
-features:
+    <strong>Novelty Selection</strong> At each iteration, the most novel programs are selected from previously generated programs (top down and bottom up frontiers),
+    to form the elites E, under the condition that their novelty score is above a novelty threshold δ nov. 
+    The local novelty score of a program ρ in a niche z is measured as the k-mean of the phenotypic distance to the archive elements of the same niche.
+    <d-footnote>Top-N programs are selected one-by-one for the sampled niche, and at each step, the novelty score of each candidate is re-evaluated to adapt to the growing niche.</d-footnote>
+  To capture interesting variations between structures, instead of a naive pixel-based distance, we rely on a pre-trained visual network (VGG 16 Simonyan and Zisserman (2014)). 
+  The phenotypic distance between programs is then defined as the euclidean distance between the CNN embedding features of the block structures they correspond to (after executing the program and rendering it as an image).
   </p>
 
 
   <p style="text-align: justify;">
-    <strong>Abstraction</strong> In essence, the abstraction phase aims to
-    grow the library from useful and novel building blocks found
-    in elites programs across niches. The abstraction phase,
-    first refactors the elites to find common program fragments,
-    before abstracting these into new programs
-    <d-footnote>This sequestration of information into reusable units –
-      abstractions– is a form of <i>knowledge distillation.</i></d-footnote>
+    <strong>Abstraction</strong> 
+    In essence, the abstraction phase aims to grow the library from useful and novel building blocks found in elites programs across niches. 
+    The abstraction phase, first refactors the elites to find common program fragments, before abstracting these into new programs.
+    <d-footnote>This sequestration of information into reusable abstracted units is a form of <i>knowledge distillation.</i></d-footnote>
     . These abstracted programs –referred to as primitives (to distinguish
     them from generated programs)– are functions with maximum 3 arguments in our experiments. It relies on the selfsupervised compression algorithm from DreamCoder (Ellis
     et al., 2021) (cf. Appendix S4.5) which aims to maximize
@@ -348,8 +334,8 @@ knowledge, through either: . (INNATE)-bootstrapped Library, initially seeded wit
         flex-direction: column; /* Stack image and caption vertically */
         align-items: center; /* Center items horizontally */
     ">
-    <img src="figures/Pressures.png" style="width: 600px">
-    <figcaption style="text-align: justify;"> The environmental, language and novelty pres-
+    <img src="figures/Pressures.png" style="width: 700px">
+    <figcaption style="text-align: justify; width: 600px;"> The environmental, language and novelty pres-
       sures at play in the selection of generated programs at each
       iteration. (1) Legit programs (grammatically correct) un-
       dergo environmental pressures (e.g. niches and minimal cri-
@@ -466,17 +452,18 @@ stead of simply artifacts.
 
 <d-appendix>
 
-  <h3>Acknowledgments</h3>
-  <p>
-    This project was funded by a DFF-Research Project grant
-(9131 − 00042B)
-  </p>
-
   <h3>Get in Touch</h3>
   <p>
     Email: clgl 'at' itu.dk  
     Twitter: @claire__aoi
   </p>
+
+  
+  <h3>Acknowledgments</h3>
+  <p>
+    This project was funded by a DFF-Research Project grant  (9131 − 00042B)
+  </p>
+
 
 
    <!--AUTHOR CONTRIB
@@ -489,17 +476,6 @@ stead of simply artifacts.
     later stages of development by performing experiments and refining the
     model.
   </p>
-
-  <p>
-    The idea of applying neural networks to understanding regeneration, and to
-    designing self-organising systems, was proposed by Michael Levin in his
-    email to Alexander, that was sent following the DeepDream
-    <d-cite key="mordvintsev2015inceptionism"></d-cite> publication by Alexander
-    in 2015. Alexander’s proposal of this model and this work were inspired by
-    the talk <d-cite key="WhatBodiesThink"></d-cite> given by Michael at NeurIPS
-    2018 as well as the subsequent email exchange between Alexander and Michael.
-  </p>
-
   <p>
     <strong>Writing &amp; Diagrams:</strong> Alexander outlined the structure of the
     article, and contributed to the content throughout. Ettore contributed to
