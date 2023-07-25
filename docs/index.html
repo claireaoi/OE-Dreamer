@@ -126,13 +126,11 @@
           grid-column: page;
           width: 100%;
           max-width: 2000px;
-          display: grid; /* Add CSS Grid */
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Adjust column size as needed */
-        gap: 10px; /* Add some space between images */
+          display: flex; /* Add Flexbox */
+        flex-direction: column; /* Stack image and caption vertically */
+        align-items: center; /* Center items horizontally */
         ">
-        <img src="figures/genomics.png" style="width: 140px">
-        <img src="figures/internet.png" style="width: 300px">
-        <img src="figures/soccer.png" style="width: 140px">
+        <img src="figures/compositionality.png" style="width: 800px">
         <figcaption style="text-align: justify; width: 800px;"> Innovation Scaffoldings: the emergence of innovation --from genomics to Internet via soccer-- can be schematized through a directed graph structure, where nodes represent artifacts or behaviors, and edges represent the dependency between them.</figcaption>
       </figure>
     </p>
@@ -352,16 +350,18 @@ knowledge, through either: . (INNATE)-bootstrapped Library, initially seeded wit
 
   <h2 id="experiment-2">Experiment 2: Novelty-Diversity Trade Off</h2>
 
-  <p>
-  </p><figure style="
+ <figure style="
       margin-left: auto;
       margin-right: auto;
       grid-column: page;
       width: 100%;
       max-width: 2000px;
+      display: flex; /* Add Flexbox */
+        flex-direction: column; /* Stack image and caption vertically */
+        align-items: center; /* Center items horizontally */
     ">
     <img src="figures/Pressures.png" style="width: 600px">
-    <figcaption> The environmental, language and novelty pres-
+    <figcaption style="text-align: justify;"> The environmental, language and novelty pres-
       sures at play in the selection of generated programs at each
       iteration. (1) Legit programs (grammatically correct) un-
       dergo environmental pressures (e.g. niches and minimal cri-
@@ -371,7 +371,7 @@ knowledge, through either: . (INNATE)-bootstrapped Library, initially seeded wit
       acted through the prior P(ρ | L); (3) finally, generated pro-
       grams are subjected to a novelty selection.</figcaption>
   </figure>
-<p></p>
+
   <p style="text-align: justify;">
     As illustrated Figure 8, at the core of OED search for
 diversity-enabling programs –and at the core of open-
@@ -439,7 +439,7 @@ tion phase and therefore the library growing
   </p>
 
   
-  <h2 id="discussion">Conclusion</h2>
+  <h2 id="discussion">Discussion</h2>
 
   <p style="text-align: justify;">
     While preliminary, our results suggest that neurally-guided
