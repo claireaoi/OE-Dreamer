@@ -306,7 +306,10 @@ Adjusting the exploration ratio α ∈ [0, 1] (ratio of sampled programs vs enum
         <li>(PHYSICS): with a gravity-aware enviroment, enacting strong environmental pressure
           <li>(CNN): with a pretrained distance metric for novelty evaluation
       </ol>
-
+      As expected, from our first experiment, both innate priors and biased metrics seems to guide OED towards producing more qualitatively compelling artifacts
+      Innate priors help bootstrap the search at early stages, yet overtime do not bring a strong advantage, which may be due to the stronger learned language bias.
+      The challenges brought by the physical constraints considerably slow down and constraint the program discovery (cf.  search times (c), or the number of found solutions). 
+    
   </p>
 
   <h2 id="experiment-2">Experiment 2: Novelty-Diversity Trade Off</h2>
@@ -332,14 +335,14 @@ Adjusting the exploration ratio α ∈ [0, 1] (ratio of sampled programs vs enum
 
   <p style="text-align: justify;">
     As illustrated Figure 5, at the core of OED search for diversity-enabling programs –and at the core of open-endedness– lies a delicate balance between environmental, efficiency and novelty pressures. 
-    These different pressures at play to select elites at each iteration may be conflictive: 
-    e.g. novel solutions compared to the archive commonly stands out as less likely given the library (therefore, less efficient) and conversely, most efficient programs (minimising the prior P(ρ | L)), often are less novel
+    These different pressures at play to select elites at each iteration may be conflictive. 
+    Indeed, learning a language also implies learning a strong inductive bias towards the search space, which may impede diversity     <d-footnote> e.g. novel solutions compared to the archive commonly stands out as less likely given the library (therefore, less efficient) and conversely, most efficient programs (minimising the prior P(ρ | L)), often are less novel.</d-footnote> .
   </p>
   <p style="text-align: justify;">
     <strong>Convergent Evolution</strong> 
-    Strong efficiency pressures, either from environmental constraints (cf. (PHYSICS)), or via stronger language-pressure (cf. (BASE)), or conversely lower novelty pressure (as in the (A-N) run), seem to favor phenomenon of convergent evolution, i.e. the repeatability of certain evolutionary outcomes. 
-    Indeed, certain programs and primitives were (approximately) reinvented across different evolutionary runs, as they appeared to be some of the most efficient way to inhabit certain ecological niches and fit the minimal criteria (notably when this one is more demanding as in the gravity-aware environment):
-    e.g. slanted lines, cranes-type structure, parallelograms, comb-like artifact, wall-type of structures, and combinations of them (as displayed in Figure ....) were invented across multiple runs.
+    Strong efficiency pressures, either from environmental constraints (cf. (PHYSICS)), or via stronger language-pressure (cf. (BASE)), or conversely lower novelty pressure (as in the (A-N) run), seem to favor phenomenon of convergent evolution, i.e. the repeatability of certain evolutionary outcomes  <d-footnote>Indeed, certain programs and primitives were (approximately) reinvented across different evolutionary runs, as they appeared to be some of the most efficient way to inhabit certain ecological niches and fit the minimal criteria (notably when this one is more demanding as in the gravity-aware environment):
+      e.g. slanted lines, cranes-type structure, parallelograms, comb-like artifact, wall-type of structures, and combinations of them (as displayed in Figure ....) were invented across multiple runs.</d-footnote>. 
+
   </p>
 
   <p style="text-align: justify;">
