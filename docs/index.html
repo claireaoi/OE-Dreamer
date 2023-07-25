@@ -337,6 +337,9 @@ Adjusting the exploration ratio α ∈ [0, 1] (ratio of sampled programs vs enum
     As illustrated Figure 5, at the core of OED search for diversity-enabling programs –and at the core of open-endedness– lies a delicate balance between environmental, efficiency and novelty pressures. 
     These different pressures at play to select elites at each iteration may be conflictive. 
     Indeed, learning a language also implies learning a strong inductive bias towards the search space, which may impede diversity     <d-footnote> e.g. novel solutions compared to the archive commonly stands out as less likely given the library (therefore, less efficient) and conversely, most efficient programs (minimising the prior P(ρ | L)), often are less novel.</d-footnote> .
+    This language bias is notably enacted through the prior P(ρ | L) pressure in the generation step. 
+    Under a strong language bias, early primitives incorporated in the library have a strong effect on the generation of new programs in later runs.
+  
   </p>
   <p style="text-align: justify;">
     <strong>Convergent Evolution</strong> 
@@ -347,13 +350,10 @@ Adjusting the exploration ratio α ∈ [0, 1] (ratio of sampled programs vs enum
 
   <p style="text-align: justify;">
     <strong>Enhanced Exploration</strong> 
-    As qualitatively reflected in the programs invented or abstracted (Figure ...), learning a language also implies learning a strong inductive bias towards the search space. 
-    This language bias is notably enacted through the prior P(ρ | L) pressure in the generation step. 
-    Under a strong language bias, early primitives incorporated in the library have a strong effect on the generation of new programs in later runs.
-  To mitigate such effect, OED provide ways to loosen the efficiency pressure in favor of the novelty pressure, by promoting exploration in the generation step, notably through increasing the exploration ratio 
-  α weighting the sampling or the sampling temperature τ 9. 
-  As qualitatively reflected Figure ..., early experiments on this enhanced exploration confirm that more diverse and novel programs are generated. 
-  However, by reducing the presence of regularities among elites, excessive exploration can impede the abstraction phase and therefore the library growing
+  To mitigate the language bias, OED provide ways to loosen the efficiency pressure in favor of the novelty pressure, by promoting exploration in the generation step, notably through increasing the exploration ratio α weighting the sampling or the sampling temperature τ. 
+  Early experiments on this enhanced exploration confirm that more diverse and novel programs are generated. 
+  However, by reducing the presence of regularities among elites, excessive exploration can impede the abstraction phase and therefore the growing of the library.
+  Further work is needed to automatically learn to adjust this balance.
 
   </p>
   
