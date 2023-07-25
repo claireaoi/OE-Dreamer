@@ -42,7 +42,7 @@
       <img src="figures/Elites_base.jpeg" style="width: 800px">
       <img src="figures/Elites_nov.jpeg" style="width: 800px">
       <img src="figures/Elites_innate.jpeg" style="width: 800px">
-      <figcaption> Figure 1: Extract of Elites Structures for a BASE (top) resp. NOVEL (middle) resp. INNATE (bottom) run.</figcaption>
+      <figcaption> <strong>Figure 1: Extract of Elites Structures</strong> for a BASE (top) resp. NOVEL (middle) resp. INNATE (bottom) run.</figcaption>
     </figure>
   <p></p>
 
@@ -137,7 +137,7 @@
           align-items: center; /* Center items horizontally */
           ">
           <img src="figures/compositionality.png" style="width: 700px">
-          <figcaption style="text-align: justify; width: 700px;"> Figure 2: Innovation Scaffoldings: the emergence of innovation --from genomics to Internet via soccer-- can be schematized through a directed graph structure, where nodes represent artifacts or behaviors, and edges represent the dependency between them.</figcaption>
+          <figcaption style="text-align: justify; width: 700px;"> <strong>Figure 2: Innovation Scaffoldings:</strong> the emergence of innovation --from genomics to Internet via soccer-- can be schematized through a directed graph structure, where nodes represent artifacts or behaviors, and edges represent the dependency between them.</figcaption>
         </figure>
       </p>
   
@@ -176,8 +176,8 @@
         align-items: center; /* Center items horizontally */
         ">
         <img src="figures/OED.png" style="width: 800px">
-        <figcaption style="text-align: justify; width: 700px;"> Figure 3: Open-Ended Dreamer follows an open-ended
-          neuro-symbolic iterative process. (1) Neurally Guided Generation: by auto-regressively querying the neural model QL,
+        <figcaption style="text-align: justify; width: 700px;"> <strong>Figure 3: Open-Ended Dreamer follows an open-ended
+          neuro-symbolic iterative process.</strong> (1) Neurally Guided Generation: by auto-regressively querying the neural model QL,
           programs are generated for each niche; (2) Novelty Selection: most novel programs are selected to form the elites (3) Abstraction across niches: refactored elites are
           abstracted to grow a library L of programmatic abstractions;
           (4) Neural Training: consolidate the neural guidance on both
@@ -188,13 +188,13 @@
   <p style="text-align: justify;">
     As DreamCoder, OED consists of both a neural and a symbolic component bootstrapping each other:
     <ol>
-      <li> L <mathfrak>L</mathfrak>, hierarchical symbolic library of programs, capturing regularities in elites across niches
-        <li> Q <mathfrak>Q</mathfrak>,, neural model guiding the search for efficient and novel programs.
+      <li> L, <i>hierarchical symbolic library</i> of programs, capturing regularities in elites across niches.
+        <li> Q_L, <i>neural model</i> guiding the search for efficient and novel programs.
         </ol>
-   As schematized in Figure 3, OED learns through an iterative process alternating generation, selection, abstraction and training steps. 
+   As schematized in Figure 3, OED learns through an iterative process alternating <i>generation, selection, abstraction and training steps</i>. 
    At each iteration, elites programs are selected and organised by niches, before possibly being abstracted in the library-learning stage. 
-  <d-footnote>The core differences with DreamCoder, detailed in the following paragraphs, are meant to encourage diversity both in the generation and abstraction phase, such as: (i) supervision relaxation via QD framework (ii) controllable exploration and stochasticity in the generation phase, (iii) novelty-selection phase (iv) stochastic pruning and novelty-filtering in the abstraction phase.
-  </d-footnote>
+  The core differences with DreamCoder, detailed in the following paragraphs, are meant to encourage diversity both in the generation and abstraction phase, such as: (i) supervision relaxation via QD framework (ii) controllable exploration and stochasticity in the generation phase, (iii) novelty-selection phase (iv) stochastic pruning and novelty-filtering in the abstraction phase.
+
 
   </p>
 
@@ -202,53 +202,33 @@
 
   <p style="text-align: justify;">
     <strong>Supervision Relaxation via Quality Diversity</strong> 
-     By adopting a QD approach, OED relaxes DreamCoder’s supervision needs by eliminating the requirement for handpicking
-    tasks. Following MAP-Elites (Mouret and Clune, 2015),
-    OED keeps track of a multi-dimensional archive of phenotypic elites A, cut into niches along some predefined behavioral characteristics. In our experiments, we use 3D behavioral features (G, W, B) composed of gravity-center (height
-    of) G, width W, and number of blocks B of the structure
-    generated. Each dimension is split in 4, to create a total of
-    4 ∗ 4 ∗ 4 = 64 niches. For instance, a program belongs
-    to the niche [0, 2, 1] if its gravity center (y-coordinate) is
-    ∈ [0, MG/4[, its width ∈ [MW /2, 3MW /4[ and its number of blocks ∈ [MB/4, MB/2[, where MG, MW , MB are
-    upper boundaries set for each feature dimension (e.g. 120,
-    240 and 400 in our experiments).
+    By adopting a QD approach, OED relaxes DreamCoder's supervision needs by eliminating the requirement for handpicking tasks. 
+    Following MAP-Elites (Mouret and Clune, 2015), OED keeps track of a multi-dimensional archive of phenotypic elites A, cut into niches along some predefined behavioral characteristics. 
+    In our experiments, we use 3D behavioral features (G, W, B) composed of gravity-center (rel. height) G, width W, and number of blocks B of the structure generated. 
+    Each dimension is split in 4, to create a total of 4 ∗ 4 ∗ 4 = 64 niches<d-footnote>For instance, a program belongs to the niche [0, 2, 1] if its gravity center (y-coordinate) is ∈ [0, MG/4[, its width ∈ [MW /2, 3MW /4[ and its number of blocks ∈ [MB/4, MB/2[, where MG, MW , MB are upper boundaries set for each feature dimension (e.g. 120, 240 and 400 in our experiments).</d-footnote>.
   </p>
 
 
 
   <p style="text-align: justify;">
     <strong>Generation with Exploration</strong> 
-  Both a top-down generation phase following the
-generative model induced by the library L, and a bottomup generation phase 
-following the conditional neural model
-Q_L takes place at different stages in each iteration. Each
-generation phase encompassing an enumeration procedure
-and a sampling procedure. In the enumeration, similarly to
-DreamCoder, programs ρ are enumerated in decreasing posterior probability order in each niche:
-arg max ρ∈z P(ρ | z, L) ∝ P(z | ρ) | {z } if fits in the niche P(ρ | L) | {z }
-how likely in library , (1) where z denotes a niche, ρ a program, L the library. The
-likelihood P(z | ρ) evaluates if a program ρ fits in a given
-niche z (i.e. 1 if it belongs to the niche, 0 else, as we opt
-for a discrete niche criteria), and the prior P(ρ | L) reflects
-how they fit in the library, i.e. how likely they are under the
-generative model L. More details about this enumeration
-procedure, which mixes best-first search with depth-first can
-be found in DreamCoder (Ellis et al., 2021), Algorithm 3.
-To encourage further exploration, OED incorporates a
-sampling from the library L (for the top down phase) or from
-neural model Q (for the bottom up phase). An exploration
-ratio α ∈ [0, 1] enables to balance between exploration and
-exploitation, by scaling up or down the amount of sampled
-programs relative to the amount of enumerated programs at
-each iteration. While the enumeration procedure aims to
-find the most efficient programs (via posterior-optimisation),
-the sampling procedure enables wider exploration, by relaxing this 
-optimisation into a minimal criteria on the posterior: P(ρ | L, z) ≥ δ
-ef f . Adjusting the exploration ratio
-α, and the sampling temperature parameter τ (Boltzman Exploration) 
-enables to balance the efficiency pressure and the
-novelty pressure, as illustrated in our experiments
-  </p>
+  Both a <i>top-down generation phase</i> following the generative model induced by the library L, and a <i>bottom-up generation phase</i> following the conditional neural model Q_L takes place at different stages in each iteration. 
+  Each generation phase encompassing an enumeration procedure and a sampling procedure. 
+  In the enumeration, similarly to DreamCoder, programs ρ are enumerated in decreasing posterior probability order in each niche:
+  <d-footnote>More details about this enumeration procedure, which mixes best-first search with depth-first can be found in DreamCoder (Ellis et al., 2021), Algorithm 3.</d-footnote>
+  <br>
+  argmax_{ρ ∈ z} P(ρ | z, L) ∝ P(z | ρ) P(ρ | L)
+<br>
+where z denotes a niche, ρ a program, L the library.
+The likelihood P(z | ρ) evaluates if a program ρ fits in a given niche z, and the prior P(ρ | L) reflects how they fit in the library, i.e. how likely they are under the generative model L. 
+To encourage further exploration, OED incorporates a sampling from the library L (for the top down phase) or from neural model Q_L (for the bottom up phase). 
+While the enumeration procedure aims to find the most efficient programs (via posterior-optimisation), the sampling procedure enables wider exploration, by relaxing this optimisation into a minimal criteria on the posterior: 
+<br>
+P(ρ | L, z) ≥ δ
+<br>
+where δ is a lower bound on the posterior.
+Adjusting the exploration ratio α ∈ [0, 1] (ratio of sampled programs vs enumerated), and the sampling temperature parameter τ (Boltzman Exploration) enables to balance the efficiency pressure, as illustrated in our experiments below.
+</p>
 
 
   <p style="text-align: justify;">
