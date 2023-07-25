@@ -126,13 +126,13 @@
           grid-column: page;
           width: 100%;
           max-width: 2000px;
-          display: flex; /* Add Flexbox */
-          flex-direction: column; /* Stack image and caption vertically */
-          align-items: center; /* Center items horizontally */
+          display: grid; /* Add CSS Grid */
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Adjust column size as needed */
+        gap: 10px; /* Add some space between images */
         ">
-        <img src="figures/genomics.png" style="width: 200px">
-        <img src="figures/internet.png" style="width: 400px">
-        <img src="figures/soccer.png" style="width: 200px">
+        <img src="figures/genomics.png" style="width: 140px">
+        <img src="figures/internet.png" style="width: 300px">
+        <img src="figures/soccer.png" style="width: 140px">
         <figcaption style="text-align: justify; width: 800px;"> Innovation Scaffoldings: the emergence of innovation --from genomics to Internet via soccer-- can be schematized through a directed graph structure, where nodes represent artifacts or behaviors, and edges represent the dependency between them.</figcaption>
       </figure>
     </p>
@@ -143,6 +143,7 @@
     Not only most lifeforms showcase a complex nested and modular structure, a significant part of human knowledge (factual or even procedural) --and human innovation-- exhibit some form of <em>hierarchical and compositional structure</em>. 
     We relentlessly invent more complex artifacts and behaviors from previous stepping stones —explicit or implicit, collective or individual. 
     This ability to re-use, combine, transfer or scale previous discoveries is crucial to both human learning and adaptation.
+    <br>
     <br>
 
     <strong>Program Synthesis with Library Learning</strong>  
