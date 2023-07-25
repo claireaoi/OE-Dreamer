@@ -42,7 +42,7 @@
       <img src="figures/Elites_base.jpeg" style="width: 800px">
       <img src="figures/Elites_nov.jpeg" style="width: 800px">
       <img src="figures/Elites_innate.jpeg" style="width: 800px">
-      <figcaption> Extract of Elites Structures for a BASE (top) resp. NOVEL (middle) resp. INNATE (bottom) run.</figcaption>
+      <figcaption> Figure 1: Extract of Elites Structures for a BASE (top) resp. NOVEL (middle) resp. INNATE (bottom) run.</figcaption>
     </figure>
   <p></p>
 
@@ -52,9 +52,9 @@
     <p style="text-align: justify;">
       Pairing a neuro-symbolic model with library learning to facilitate <i>program induction</i> seems a 
       promising way of fostering <i>open-ended innovation</i>, by leveraging the robustness, expressivity, 
-      and extrapolative capabilities of programs. This paper investigates how <b>Open-Ended Dreamer (OED)</b>, 
+      and extrapolative capabilities of programs. This paper presents Open-Ended Dreamer (OED), 
       an unsupervised diversity-oriented neuro-symbolic learner built upon DreamCoder <d-cite key="ellis2021dreamcoder"></d-cite>, 
-      may support open-ended program discovery. By alternating between phases of generation, selection, and abstraction, 
+      as a first step towards harnessing compositionality for open-ended program discovery. By alternating between phases of generation, selection, and abstraction, 
       OED aims to expand a hierarchical library of <i>diversity-enabling</i> building blocks (in the form of programs), 
       which are subsequently reused and composed in later iterations. As a first test-bed, we apply OED to a tower building
        domain and investigate the impact of library learning, neural guidance, innate priors, and language 
@@ -123,9 +123,8 @@
     <p style="text-align: justify;">
    <strong>Compositionality for Open-Endedness</strong>  
    Not only do the majority of lifeforms display intricate nested and modular structures, but a considerable portion of human knowledge, whether factual or procedural, also embodies a form of hierarchical and compositional arrangement. 
-   We continually create more sophisticated artifacts and behaviors by building upon previous achievements, whether they are explicit or implicit, originating from collective or individual efforts. 
-   The capacity to reuse, combine, transfer, or expand upon past discoveries plays a pivotal role in human learning and adaptation. 
-   This ability appears essential for fostering open-ended innovation and achieving a certain level of complexity.
+   We continually create more sophisticated artifacts and behaviors by building upon previous achievements --from genomics to internet via soccer (cf. Figure 2)--, whether they are explicit or implicit, originating from collective or individual efforts. 
+   The capacity to reuse, combine, transfer, or expand upon past discoveries plays a pivotal role in human learning and adaptation, and appears essential for fostering open-ended innovation.
      <p>
       <figure style="
             margin-left: auto;
@@ -137,14 +136,14 @@
           flex-direction: column; /* Stack image and caption vertically */
           align-items: center; /* Center items horizontally */
           ">
-          <img src="figures/compositionality.png" style="width: 600px">
-          <figcaption style="text-align: justify; width: 600px;"> Innovation Scaffoldings: the emergence of innovation --from genomics to Internet via soccer-- can be schematized through a directed graph structure, where nodes represent artifacts or behaviors, and edges represent the dependency between them.</figcaption>
+          <img src="figures/compositionality.png" style="width: 700px">
+          <figcaption style="text-align: justify; width: 700px;"> Figure 2: Innovation Scaffoldings: the emergence of innovation --from genomics to Internet via soccer-- can be schematized through a directed graph structure, where nodes represent artifacts or behaviors, and edges represent the dependency between them.</figcaption>
         </figure>
       </p>
   
     <br>
     <br>
-
+  <p style="text-align: justify;">
     <strong>Program Synthesis with Library Learning</strong>  
     With the aim to harness compositional power for open-ended innovation, programs appear as a compelling candidate representation.
     Indeed, programs are an adaptive, robust and expressive way to encode both artifacts and behaviors, compelling for their logical, interpretative and extrapolative qualities.
@@ -177,7 +176,7 @@
         align-items: center; /* Center items horizontally */
         ">
         <img src="figures/OED.png" style="width: 800px">
-        <figcaption style="text-align: justify; width: 800px;"> Open-Ended Dreamer follows an open-ended
+        <figcaption style="text-align: justify; width: 700px;"> Figure 3: Open-Ended Dreamer follows an open-ended
           neuro-symbolic iterative process. (1) Neurally Guided Generation: by auto-regressively querying the neural model QL,
           programs are generated for each niche; (2) Novelty Selection: most novel programs are selected to form the elites (3) Abstraction across niches: refactored elites are
           abstracted to grow a library L of programmatic abstractions;
@@ -189,16 +188,13 @@
   <p style="text-align: justify;">
     As DreamCoder, OED consists of both a neural and a symbolic component bootstrapping each other:
     <ol>
-      <li> L, hierarchical symbolic library of programs, capturing regularities in elites across niches
-        <li> Q, neural model guiding the search for efficient and novel programs.
+      <li> L <mathfrak>L</mathfrak>, hierarchical symbolic library of programs, capturing regularities in elites across niches
+        <li> Q <mathfrak>Q</mathfrak>,, neural model guiding the search for efficient and novel programs.
         </ol>
-   As schematized in Figure 1, OED learns through an iterative process alternating generation, selection, abstraction and training steps: at each iteration, elites
-  programs are selected and organised by niches, before possibly being abstracted in the library-learning stage. The
-  core differences with DreamCoder, detailed in the following paragraphs, are meant to encourage diversity both in
-  the generation and abstraction phase, such as: (i) supervision relaxation via QD framework (ii) controllable
-  exploration and stochasticity in the generation phase,
-  (iii) novelty-selection phase (iv) stochastic pruning and
-  novelty-filtering in the abstraction phase.
+   As schematized in Figure 3, OED learns through an iterative process alternating generation, selection, abstraction and training steps. 
+   At each iteration, elites programs are selected and organised by niches, before possibly being abstracted in the library-learning stage. 
+  <d-footnote>The core differences with DreamCoder, detailed in the following paragraphs, are meant to encourage diversity both in the generation and abstraction phase, such as: (i) supervision relaxation via QD framework (ii) controllable exploration and stochasticity in the generation phase, (iii) novelty-selection phase (iv) stochastic pruning and novelty-filtering in the abstraction phase.
+  </d-footnote>
 
   </p>
 
