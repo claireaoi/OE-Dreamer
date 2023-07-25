@@ -203,11 +203,8 @@
     <strong>Supervision Relaxation via Quality Diversity</strong> 
     By adopting a QD approach, OED relaxes DreamCoder's supervision needs by eliminating the requirement for handpicking tasks. 
     Following MAP-Elites (Mouret and Clune, 2015), OED keeps track of a multi-dimensional archive of phenotypic elites A, cut into niches along some predefined behavioral characteristics. 
-    In our experiments, we use 3D behavioral features (G, W, B) composed of gravity-center (rel. height) G, width W, and number of blocks B of the structure generated. 
-    Each dimension is split in 4, to create a total of 4 ∗ 4 ∗ 4 = 64 niches<d-footnote>For instance, a program belongs to the niche [0, 2, 1] if its gravity center (y-coordinate) is ∈ [0, MG/4[, its width ∈ [MW /2, 3MW /4[ and its number of blocks ∈ [MB/4, MB/2[, where MG, MW , MB are upper boundaries set for each feature dimension (e.g. 120, 240 and 400 in our experiments).</d-footnote>.
+    In our experiments, we use 3D behavioral features (G, W, B) composed of gravity-center (rel. height) G, width W, and number of blocks B of the structure generated <d-footnote> Each dimension is split in 4, to create a total of 4 ∗ 4 ∗ 4 = 64 niches. For instance, a program belongs to the niche [0, 2, 1] if its gravity center (y-coordinate) is ∈ [0, MG/4[, its width ∈ [MW /2, 3MW /4[ and its number of blocks ∈ [MB/4, MB/2[, where MG, MW , MB are upper boundaries set for each feature dimension (e.g. 120, 240 and 400 in our experiments).</d-footnote>. 
   </p>
-
-
 
   <p style="text-align: justify;">
     <strong>Generation with Exploration</strong> 
@@ -221,7 +218,6 @@
     argmax_{ρ ∈ z} P(ρ | z, L) ∝ P(z | ρ) P(ρ | L)
   </p>
   <p style="text-align: justify;">
-<br>
 where z denotes a niche, ρ a program, L the library.
 The likelihood P(z | ρ) evaluates if a program ρ fits in a given niche z, and the prior P(ρ | L) reflects how they fit in the library, i.e. how likely they are under the generative model L. 
 <li>To encourage further exploration, OED incorporates a sampling from the library L (for the top down phase) or from neural model Q_L (for the bottom up phase). 
@@ -231,7 +227,6 @@ The likelihood P(z | ρ) evaluates if a program ρ fits in a given niche z, and 
   P(ρ | L, z) ≥ δ
 </p>
 <p style="text-align: justify;">
-  <br>
 where δ is a lower bound on the posterior.
 Adjusting the exploration ratio α ∈ [0, 1] (ratio of sampled programs vs enumerated), and the sampling temperature parameter τ (Boltzman Exploration) enables to balance the efficiency pressure, as illustrated in our experiments below.
 </ol>
@@ -241,53 +236,33 @@ Adjusting the exploration ratio α ∈ [0, 1] (ratio of sampled programs vs enum
   <p style="text-align: justify;">
     <strong>Novelty Selection</strong> At each iteration, the most novel programs are selected from previously generated programs (top down and bottom up frontiers),
     to form the elites E, under the condition that their novelty score is above a novelty threshold δ nov. 
-    The local novelty score of a program ρ in a niche z is measured as the k-mean of the phenotypic distance to the archive elements of the same niche.
+    The local novelty score of a program ρ in a niche z is measured as the k-mean of the phenotypic distance to the archive elements of the same niche, which in most of our experiment relies on a pre-trained visual network (VGG 16 Simonyan and Zisserman (2014))  <d-footnote>The phenotypic distance between programs is then defined as the euclidean distance between the CNN embedding features of the block structures they correspond to (after executing the program and rendering it as an image). </d-footnote>.
     <d-footnote>Top-N programs are selected one-by-one for the sampled niche, and at each step, the novelty score of each candidate is re-evaluated to adapt to the growing niche.</d-footnote>
-  To capture interesting variations between structures, instead of a naive pixel-based distance, we rely on a pre-trained visual network (VGG 16 Simonyan and Zisserman (2014)). 
-  The phenotypic distance between programs is then defined as the euclidean distance between the CNN embedding features of the block structures they correspond to (after executing the program and rendering it as an image).
   </p>
 
 
   <p style="text-align: justify;">
     <strong>Abstraction</strong> 
     In essence, the abstraction phase aims to grow the library from useful and novel building blocks found in elites programs across niches. 
-    The abstraction phase, first refactors the elites to find common program fragments, before abstracting these into new programs.
-    <d-footnote>This sequestration of information into reusable abstracted units is a form of <i>knowledge distillation.</i></d-footnote>
-    . These abstracted programs –referred to as primitives (to distinguish
-    them from generated programs)– are functions with maximum 3 arguments in our experiments. It relies on the selfsupervised compression algorithm from DreamCoder (Ellis
-    et al., 2021) (cf. Appendix S4.5) which aims to maximize
-    a Bayesian criterion, through a generalised Expectation Maximisation algorithm.
-    To encourage a more evolving library, soften the language-bias, and incorporate additional stochasticity
-    <d-footnote>Stochasticity, instabilities, and the possibility of historical contingencies seems to be tied to the emergence of innovation, as argued in Taylor et al. (2016).</d-footnote>
-    , OED includes a stochastic pruning mechanism, weighted by innovation persistence:
-    every iteration, a weighted sampling of ≤ β primitives to
-    prune is performed (β = 2, 3 in our experiments). The sampling weights corresponds to the activity score of each primitive at the current iteration, as defined in Equation 6. We
-    also incorporate a novelty-guided library minimal criteria,
-    enforcing the new primitives to be distant enough from the
-    existing primitives, relying on a point-based approximation
-    defined in Equation 5 and illustrated Figure 3.
-    <d-footnote>Distance between primitives (function): first,
-      we sample for each primitive a set Cˆ
-      p of mp ≤ 20 programs  obtained by instantiating p on arguments ∈ {0, 9}. 
-      The approximate distance between primitives is then defined as the
-      mean over programs in p-cloud of the distance to the p
-      ′−cloud.</d-footnote>
-    
+    The abstraction phase, first refactors the elites to find common program fragments, before abstracting these into new programs
+    <d-footnote> It relies on the self-supervised compression algorithm from DreamCoder (Ellis
+      et al., 2021) (cf. Appendix S4.5) which aims to maximize a Bayesian criterion, through a generalised Expectation Maximisation algorithm.</d-footnote>.
+      This sequestration of information into reusable abstracted units is a form of <i>knowledge distillation.</i>
+      These abstracted programs are functions with maximum 3 arguments in our experiments.
+    To encourage a more evolving library, soften the language-bias, and incorporate additional stochasticity, OED includes a stochastic pruning mechanism, weighted by innovation persistence:
+    every iteration, a weighted sampling of ≤ β primitives to prune is performed (β = 2, 3 in our experiments). 
+    The sampling weights corresponds to the activity score of each primitive at the current iteration.
+    We also incorporate a novelty-guided library minimal criteria, enforcing the new primitives to be distant enough from the existing primitives, relying on a point-based approximation.
+    <d-footnote>Distance between primitives (function): first, we sample for each primitive a set Cˆp of mp ≤ 20 programs  obtained by instantiating p on arguments ∈ {0, 9}. 
+      The approximate distance between primitives is then defined as the mean over programs in p-cloud of the distance to the p′−cloud.</d-footnote>
   </p>
 
 
   <p style="text-align: justify;">
-    <strong>Abstraction</strong> The neural model, illustrated in Figure 2, aims to learn how to compose the programmatic abstraction to create novel programs. It encodes a distribution
-    over the elements in the library conditioned on the local context: taking as input a latent niche vector z, and the current
-    state s passed as an image (e.g. image of the current tower
-being constructed), it outputs a probability tensor encoding
-the probability of a next token being j given the previous token in the growing language. Querying the neural model Q
-auto-regressively produces a program. It is trained both on
-replays –i.e. elites from previous iterations– and dreams –i.e
-programs sampled from the generative model, with a default
-dream ratio of 0.5. It plays the crucial role of biasing the
-search space, as it drastically reduces the breadth of search
-in the combinatorially exploding space of programs.
+    <strong>Neural Training</strong> The neural model, aims to learn how to compose the programmatic abstraction to create novel programs. 
+    It encodes a distribution over the elements in the library conditioned on the local context: taking as input a latent niche vector z, and the current state s passed as an image (e.g. image of the current tower being constructed), 
+    it outputs a probability tensor encoding the probability of a next token being j given the previous token in the growing language. Querying the neural model Q auto-regressively produces a program. It is trained both on replays –i.e. elites from previous iterations– and dreams –i.e programs sampled from the generative model. 
+    It plays the crucial role of biasing the search space, as it drastically reduces the breadth of search in the combinatorially exploding space of programs.
 
   </p>
 
@@ -304,7 +279,20 @@ in the combinatorially exploding space of programs.
 
 
   <h2 id="experiment-1">Experiment 1: Bias Experiment</h2>
-
+  <figure style="
+  margin-left: auto;
+  margin-right: auto;
+  grid-column: page;
+  width: 100%;
+  max-width: 2000px;
+  display: flex; /* Add Flexbox */
+    flex-direction: column; /* Stack image and caption vertically */
+    align-items: center; /* Center items horizontally */
+">
+<img src="figures/biasXP.png" style="width: 700px">
+<figcaption style="text-align: justify; width: 600px;"> 
+  <strong> Figure 4: Bias Experiment  </strong>.</figcaption>
+</figure>
 
   <p style="text-align: justify;">
     The emphasis on implementation nested in the notion of <i>innovation</i> implies the candidate novel artifacts-ideas will likely undergo strong environmental pressures (e.g. market pressure, functional pressures, social pressures etc.) when being put at test in the real world, heavily biasing the search space. 
@@ -335,7 +323,7 @@ in the combinatorially exploding space of programs.
     ">
     <img src="figures/Pressures.png" style="width: 700px">
     <figcaption style="text-align: justify; width: 600px;"> 
-      <strong> Figure 4: The environmental, language and novelty pressures at play in the selection of generated programs at each iteration. </strong>
+      <strong> Figure 5: The environmental, language and novelty pressures at play in the selection of generated programs at each iteration. </strong>
       (1) Legit programs (grammatically correct) undergo environmental pressures (e.g. niches and minimal criteria on the number of blocks, width, etc.), enclosed in the
       likelihood P(z | ρ); 
       (2) Candidates programs undergo a language-pressure, deriving from the learned library L, enacted through the prior P(ρ | L); 
@@ -343,7 +331,7 @@ in the combinatorially exploding space of programs.
   </figure>
 
   <p style="text-align: justify;">
-    As illustrated Figure 4, at the core of OED search for diversity-enabling programs –and at the core of open-endedness– lies a delicate balance between environmental, efficiency and novelty pressures. 
+    As illustrated Figure 5, at the core of OED search for diversity-enabling programs –and at the core of open-endedness– lies a delicate balance between environmental, efficiency and novelty pressures. 
     These different pressures at play to select elites at each iteration may be conflictive: 
     e.g. novel solutions compared to the archive commonly stands out as less likely given the library (therefore, less efficient) and conversely, most efficient programs (minimising the prior P(ρ | L)), often are less novel
   </p>
@@ -366,16 +354,30 @@ in the combinatorially exploding space of programs.
 
   </p>
   
-  <h2 id="experiment-3">Experiment 3: Ablation Experiment</h2>
+  <h2 id="experiment-3">Experiment 3: Ablation Experiments</h2>
+  <figure style="
+  margin-left: auto;
+  margin-right: auto;
+  grid-column: page;
+  width: 100%;
+  max-width: 2000px;
+  display: flex; /* Add Flexbox */
+    flex-direction: column; /* Stack image and caption vertically */
+    align-items: center; /* Center items horizontally */
+">
+<img src="figures/ablationXP.png" style="width: 700px">
+<figcaption style="text-align: justify; width: 600px;"> 
+  <strong> Figure 6: Ablation Experiment.  </strong></figcaption>
+</figure>
   <p style="text-align: justify;">
     To assess the benefit of the different components of our model in the open-ended creation of diverse programs, we run several ablation studies:
     <ol>
       <li> (A-L) without the library
         <li> (A-R) without the neural guidance
           <li> (A-N) without the novelty-Selection phase. 
-      Qualitative results in ... confirms quantitative results in ... 
-      in terms of the overall impoverishment of found solutions in these ablation experiments.
-  </p>
+      
+      
+          </p>
 
   
   <h2 id="discussion">Discussion</h2>
