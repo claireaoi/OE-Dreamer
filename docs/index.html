@@ -53,7 +53,7 @@
       Pairing a neuro-symbolic model with library learning to facilitate <i>program induction</i> seems a 
       promising way of fostering <i>open-ended innovation</i>, by leveraging the robustness, expressivity, 
       and extrapolative capabilities of programs. This paper investigates how <b>Open-Ended Dreamer (OED)</b>, 
-      an unsupervised diversity-oriented neuro-symbolic learner built upon DreamCoder <d-cite key="ellis2021dreamcoder">DreamCoder</d-cite>, 
+      an unsupervised diversity-oriented neuro-symbolic learner built upon DreamCoder <d-cite key="ellis2021dreamcoder"></d-cite>, 
       may support open-ended program discovery. By alternating between phases of generation, selection, and abstraction, 
       OED aims to expand a hierarchical library of <i>diversity-enabling</i> building blocks (in the form of programs), 
       which are subsequently reused and composed in later iterations. As a first test-bed, we apply OED to a tower building
@@ -88,7 +88,7 @@
 
     <div>
       <h3>Published</h3>
-      <p>at Alife 2023</p> 
+      <p>Alife 2023</p> 
     </div>
   </div>
 </d-byline>
@@ -97,6 +97,7 @@
 <d-contents>
   <nav class="l-text toc figcaption">
     <h3>Contents</h3>
+    <div><a href="#introduction">Introduction</a></div>
     <div><a href="#model">Model</a></div>
     <div><a href="#experiment-0">Tower Domain Experiments</a></div>
     <ul>
@@ -109,46 +110,67 @@
 </d-contents>
 
 
+<h2 id="introduction">Introduction</h2>
 
-  <p>
-   Open-ended refers to a process that produces increasingly
-    diverse and complex artifacts or behaviors. An archetypal
-    inspiration are evolutionary processes which, through iterations 
-    blending variation and selection mechanisms, have
-    brought a stunningly diverse array of lifeforms on Earth.
-    Most of these lifeforms showcase a complex nested and
-    modular structure, whose primitive components can be
-    found across numerous other species.
-    Similarly, a significant part of human knowledge (factual
-    or even procedural) exhibit some form of hierarchical and
-    compositional structure, as we relentlessly invent more complex 
-    artifacts and behaviors from previous stepping stones
-    —explicit or implicit, collective or individual. This ability
-    to re-use, combine, transfer or scale previous discoveries is
-    crucial to both human learning and adaptation.
-    Methods combining symbolic component with neural
-    learning have shown great potential in grasping forms of
-    compositional generalisation, while providing interpretable
-    representations (Chen et al., 2020; De Raedt et al., 2019).
-    For instance, a neuro-symbolic model like DreamCoder (Ellis et al., 2021) h
-    as proven to be versatile in tackling multiple domains via program induction<d-footnote>
-    Programs are an adaptive, robust and expressive way to encode
-    both artifacts and behaviors, compelling for their logical, interpretative and extrapolative qualities.</d-footnote>
-    ,from creative tasks as logo generation to more classic programming inductive 
-    tasks like physical laws regression.
-    This work extends DreamCoder towards open-endedness, with ways to encourage diversity 
-    in both program generation and abstraction, but also making it less dependent on
-    supervision. Our diversity-oriented neuro-symbolic model—Open-Ended Dreamer (OED)— 
-    balances efficiency and novelty pressures in order to learn a compact and diverse
-    set of reusable programs, organised in a hierarchical library.
+  <p style="text-align: justify;">
+    <strong>Open-Endedness: </strong> 
+   <em>Open-ended</em> refers to a process that produces increasingly diverse and complex artifacts or behaviors.
+   An archetypal inspiration are evolutionary processes which, through iterations blending variation and selection mechanisms, have brought a stunningly diverse array of lifeforms on Earth.
+   Most of these lifeforms showcase a complex nested and modular structure, whose primitive components can be found across numerous other species.
 
+  </p>
+   <p>
+    <figure style="
+          margin-left: auto;
+          margin-right: auto;
+          grid-column: page;
+          width: 100%;
+          max-width: 2000px;
+        ">
+        <img src="figures/genomics.png" style="width: 120px">
+        <img src="figures/internet.png" style="width: 200px">
+        <img src="figures/soccer.png" style="width: 120px">
+        <figcaption style="text-align: justify;"> Innovation Scaffoldings: the emergence of innovation --from genomics to Internet via soccer-- can be schematized through a directed graph structure, where nodes represent artifacts or behaviors, and edges represent the dependency between them.</figcaption>
+      </figure>
+    </p>
+    
+    <p style="text-align: justify;">
+   <strong>Compositionality for Open-Endedness</strong>  
+
+    Similarly to the way these organisms are formed, a significant part of human knowledge (factual or even procedural) --and human innovation-- exhibit some form of <em>hierarchical and compositional structure</em>. 
+    We relentlessly invent more complex artifacts and behaviors from previous stepping stones —explicit or implicit, collective or individual. 
+    This ability to re-use, combine, transfer or scale previous discoveries is crucial to both human learning and adaptation.
     
 
+    <strong>Program Synthesis with Library Learning</strong>  
+    Methods combining symbolic component with neural learning have shown great potential in grasping forms of compositional generalisation, while providing interpretable representations (Chen et al., 2020; De Raedt et al., 2019).
+    <d-footnote>Programs are an adaptive, robust and expressive way to encode both artifacts and behaviors, compelling for their logical, interpretative and extrapolative qualities.</d-footnote>
+    For instance, a neuro-symbolic model like DreamCoder (Ellis et al., 2021) has proven to be versatile in tackling multiple domains via program induction,from creative tasks as logo generation to more classic programming inductive tasks like physical laws regression.
+    This work extends DreamCoder towards open-endedness, with ways to encourage diversity in both program generation and abstraction, but also making it less dependent on supervision. 
+    Our diversity-oriented neuro-symbolic model—Open-Ended Dreamer (OED)— balances efficiency and novelty pressures in order to learn a compact and diverse set of reusable programs, organised in a hierarchical library.
 
   </p>
 
   <h2 id="model">Model</h2>
   <p>
+    <figure style="
+          margin-left: auto;
+          margin-right: auto;
+          grid-column: page;
+          width: 100%;
+          max-width: 2000px;
+        ">
+        <img src="figures/OED.png" style="width: 600px">
+        <figcaption style="text-align: justify;"> Open-Ended Dreamer follows an open-ended
+          neuro-symbolic iterative process. (1) Neurally Guided Generation: by auto-regressively querying the neural model QL,
+          programs are generated for each niche; (2) Novelty Selection: most novel programs are selected to form the elites (3) Abstraction across niches: refactored elites are
+          abstracted to grow a library L of programmatic abstractions;
+          (4) Neural Training: consolidate the neural guidance on both
+          replays and sampled programs.</figcaption>
+      </figure>
+    </p>
+
+  <p style="text-align: justify;">
     As DreamCoder, OED consists of both a neural and a symbolic component bootstrapping each other:
   L, hierarchical symbolic library of programs, capturing regularities in elites across niches
   Q, neural model guiding the search for efficient and novel programs.
@@ -164,27 +186,8 @@
   </p>
 
 
-  <p>
-    </p><figure style="
-        margin-left: auto;
-        margin-right: auto;
-        grid-column: page;
-        width: 100%;
-        max-width: 2000px;
-      ">
-      <img src="figures/OED.png" style="width: 600px">
-      <figcaption> Open-Ended Dreamer follows an open-ended
-        neuro-symbolic iterative process. (1) Neurally Guided Generation: by auto-regressively querying the neural model QL,
-        programs are generated for each niche; (2) Novelty Selection: most novel programs are selected to form the elites (3) Abstraction across niches: refactored elites are
-        abstracted to grow a library L of programmatic abstractions;
-        (4) Neural Training: consolidate the neural guidance on both
-        replays and sampled programs.</figcaption>
-    </figure>
-  <p></p>
 
-
-
-  <p>
+  <p style="text-align: justify;">
     <strong>Supervision Relaxation via Quality Diversity</strong> 
      By adopting a QD approach, OED relaxes DreamCoder’s supervision needs by eliminating the requirement for handpicking
     tasks. Following MAP-Elites (Mouret and Clune, 2015),
@@ -200,7 +203,7 @@
 
 
 
-  <p>
+  <p style="text-align: justify;">
     <strong>Generation with Exploration</strong> 
   Both a top-down generation phase following the
 generative model induced by the library L, and a bottomup generation phase 
@@ -235,7 +238,7 @@ novelty pressure, as illustrated in our experiments
   </p>
 
 
-  <p>
+  <p style="text-align: justify;">
     <strong>Novelty Selection</strong> At each iteration, the most
     novel programs are selected from previously generated programs (top down and bottom up frontiers), 
     to form the elites
@@ -258,7 +261,7 @@ features:
   </p>
 
 
-  <p>
+  <p style="text-align: justify;">
     <strong>Abstraction</strong> In essence, the abstraction phase aims to
     grow the library from useful and novel building blocks found
     in elites programs across niches. The abstraction phase,
@@ -289,7 +292,7 @@ features:
   </p>
 
 
-  <p>
+  <p style="text-align: justify;">
     <strong>Abstraction</strong> The neural model, illustrated in Figure 2, aims to learn how to compose the programmatic abstraction to create novel programs. It encodes a distribution
     over the elements in the library conditioned on the local context: taking as input a latent niche vector z, and the current
     state s passed as an image (e.g. image of the current tower
@@ -305,17 +308,11 @@ in the combinatorially exploding space of programs.
   </p>
 
   <h2 id="experiment-0">Experiments: Tower Domain</h2>
-  <p>
-    We demonstrate our algorithm on the
-Tower Domain introduced in DreamCoder (Ellis et al.
-(2021), Appendix S2.1.4). We rely on the same monadic,
-continuation-passing encoding of imperative programs. In
-this domain, the programs produce a sequence of actions,
-which encode the instruction of a hand moving over a 2D
-discretized canvas, which can drop horizontal or vertical
+  <p style="text-align: justify;">
+    We demonstrate our algorithm on the Tower Domain introduced in DreamCoder (Ellis et al. (2021), Appendix S2.1.4). We rely on the same monadic, continuation-passing encoding of imperative programs. In
+this domain, the programs produce a sequence of actions, which encode the instruction of a hand moving over a 2D discretized canvas, which can drop horizontal or vertical
 blocks. The state of the hand includes both a 1D position and a boolean orientation. By default, the initial Library is seeded with two basic control flow primitives: for
-(for loop), and get/set which gets and saves the current
-state of the agent’s hand. We also provide movement-related
+(for loop), and get/set which gets and saves the current state of the agent’s hand. We also provide movement-related
 and construction-related primitives: moveHand (advancing the hand), reverseHand (flipping the orientation),
 dropVerticalBlock and dropHorizontalBlock.
 To define the niches, we adopt a 3D behavioral characteristic, consisting of (1) center of gravity (y-coordinate) (2)
@@ -327,7 +324,7 @@ width, and (3) number of blocks of the tower structure generated from a program.
   <h2 id="experiment-1">Experiment 1: Bias Experiment</h2>
 
 
-  <p>
+  <p style="text-align: justify;">
     The emphasis on implementation nested in the notion of innovation implies the candidate
 novel artifacts-ideas will likely undergo strong environmental pressures (e.g. market pressure, functional pressures, social pressures etc.) when being put at test in the real world,
 heavily biasing the search space. It seems therefore legitimate to wonder if strong inductive biases and environmental
@@ -368,7 +365,7 @@ knowledge, through either: . (INNATE)-bootstrapped Library, initially seeded wit
       grams are subjected to a novelty selection.</figcaption>
   </figure>
 <p></p>
-  <p>
+  <p style="text-align: justify;">
     As illustrated Figure 8, at the core of OED search for
 diversity-enabling programs –and at the core of open-
 endedness– lies a delicate balance between environmental,
@@ -379,7 +376,7 @@ stands out as less likely given the library (therefore, less ef-
 ficient) and conversely, most efficient programs (minimising
 the prior P(ρ | L)), often are less novel
   </p>
-  <p>
+  <p style="text-align: justify;">
     <strong>Convergent Evolution</strong> Strong efficiency pressures, either
     from environmental constraints (cf. (PHYSICS)), or via
     stronger language-pressure (cf. (BASE)), or conversely
@@ -397,7 +394,7 @@ the prior P(ρ | L)), often are less novel
 
   </p>
 
-  <p>
+  <p style="text-align: justify;">
     <strong>Enhanced Exploration</strong> 
     As qualitatively reflected in the
 programs invented or abstracted (Figures 4, Figure 5), learn-
@@ -423,7 +420,7 @@ tion phase and therefore the library growing
   </p>
   
   <h2 id="experiment-3">Experiment 3: Ablation Experiment</h2>
-  <p>
+  <p style="text-align: justify;">
     To assess the benefit of the different components of our
     model in the open-ended creation of diverse programs,
     we run several ablation studies both (A-L) without the li-
@@ -437,7 +434,7 @@ tion phase and therefore the library growing
   
   <h2 id="discussion">Conclusion</h2>
 
-  <p>
+  <p style="text-align: justify;">
     While preliminary, our results suggest that neurally-guided
 library learning, enabling both more efficient program dis-
 covery and more sustained diversity is a promising framing
